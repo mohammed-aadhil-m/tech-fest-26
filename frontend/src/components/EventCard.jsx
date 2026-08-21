@@ -24,9 +24,19 @@ const categoryStyles = {
   },
 };
 
+const customDescriptions = {
+  'bug-buster': 'Test your technical knowledge, survive the quiz, debug the code, and race to the Top 3! 🐞💻🏆',
+  'treasure-hunt': 'Scan, solve, search, and race through hidden QR clues to find the final treasure! 🔍🏆',
+  'adaptune': 'Listen, think, guess, and race to identify the song using music clues, creativity, and speed! 🎵',
+  'dev-deploy': 'Build a creative AI-powered website, make it fully functional, deploy it online, and present your live project!',
+  'paper-presentation': 'Present innovative ideas, research, and creative solutions, showcase your technical knowledge, and inspire others with your unique perspective! 📄🚀',
+  'connect-sketch': 'Connect visual clues, unleash your creativity, sketch technical concepts, and race your teammates to guess the answer! 🎨🧩💻'
+};
+
 export default function EventCard({ event, index = 0 }) {
   const isComingSoon = event.category === 'coming-soon';
   const style = categoryStyles[event.category] || categoryStyles.technical;
+  const description = customDescriptions[event.slug] || event.description;
 
   return (
     <motion.div
@@ -68,9 +78,9 @@ export default function EventCard({ event, index = 0 }) {
         </div>
 
         {/* Header Info */}
-        <div className="p-4 flex-1 flex flex-col items-center justify-center text-center border-t border-gray-100">
+        <div className="p-5 flex-1 flex flex-col items-center justify-center text-center border-t border-gray-100 bg-white">
           <span
-            className="inline-flex items-center gap-1 px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full mb-2"
+            className="inline-flex items-center gap-1 px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full mb-3"
             style={{
               backgroundColor: style.badge.bg,
               color: style.badge.color,
@@ -79,12 +89,12 @@ export default function EventCard({ event, index = 0 }) {
           >
             {style.label}
           </span>
-          <h3
-            className="text-lg sm:text-xl font-display font-black leading-tight"
-            style={{ color: '#222222' }}
+          <p
+            className="text-sm font-medium leading-relaxed px-2"
+            style={{ color: '#444444' }}
           >
-            {event.name}
-          </h3>
+            {description}
+          </p>
         </div>
       </Link>
     </motion.div>
