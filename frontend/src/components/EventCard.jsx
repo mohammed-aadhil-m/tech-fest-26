@@ -29,7 +29,7 @@ const customDescriptions = {
   'treasure-hunt': 'Scan, solve, search, and race through hidden QR clues to find the final treasure! ',
   'adaptune': 'Listen, think, guess, and race to identify the song using music clues, creativity, and speed! ',
   'dev-deploy': 'Build a creative AI-powered website, make it fully functional, deploy it online, and present your live project!',
-  'paper-presentation': 'Present innovative ideas, research, and creative solutions, showcase your technical knowledge, and inspire others with your unique perspective! 📄🚀',
+  'paper-presentation': 'Present innovative ideas, research, and creative solutions, showcase your technical knowledge, and inspire others with your unique perspective! ',
   'connect-sketch': 'Connect visual clues, unleash your creativity, sketch technical concepts, and race your teammates to guess the answer! '
 };
 
