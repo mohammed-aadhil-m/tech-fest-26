@@ -25,12 +25,12 @@ const categoryStyles = {
 };
 
 const customDescriptions = {
-  'bug-buster': 'Test your technical knowledge, survive the quiz, debug the code, and race to the Top 3! 🐞💻🏆',
-  'treasure-hunt': 'Scan, solve, search, and race through hidden QR clues to find the final treasure! 🔍🏆',
-  'adaptune': 'Listen, think, guess, and race to identify the song using music clues, creativity, and speed! 🎵',
+  'bug-buster': 'Test your technical knowledge, survive the quiz, debug the code, and race to the Top 3! ',
+  'treasure-hunt': 'Scan, solve, search, and race through hidden QR clues to find the final treasure! ',
+  'adaptune': 'Listen, think, guess, and race to identify the song using music clues, creativity, and speed! ',
   'dev-deploy': 'Build a creative AI-powered website, make it fully functional, deploy it online, and present your live project!',
   'paper-presentation': 'Present innovative ideas, research, and creative solutions, showcase your technical knowledge, and inspire others with your unique perspective! 📄🚀',
-  'connect-sketch': 'Connect visual clues, unleash your creativity, sketch technical concepts, and race your teammates to guess the answer! 🎨🧩💻'
+  'connect-sketch': 'Connect visual clues, unleash your creativity, sketch technical concepts, and race your teammates to guess the answer! '
 };
 
 export default function EventCard({ event, index = 0 }) {
@@ -58,9 +58,9 @@ export default function EventCard({ event, index = 0 }) {
       >
         {/* Banner Image */}
         <div className="w-full h-48 sm:h-56 md:h-64 bg-gray-100 relative overflow-hidden flex-shrink-0">
-          <img 
-            src={`/images/events/${event.slug}.jpg`} 
-            alt={event.name} 
+          <img
+            src={`/images/events/${event.slug}.jpg`}
+            alt={event.name}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             onError={(e) => {
               e.target.onerror = null;
@@ -68,8 +68,8 @@ export default function EventCard({ event, index = 0 }) {
               document.getElementById(`fallback-card-icon-${event.slug}`).style.display = 'flex';
             }}
           />
-          <div 
-            id={`fallback-card-icon-${event.slug}`} 
+          <div
+            id={`fallback-card-icon-${event.slug}`}
             className="hidden absolute inset-0 items-center justify-center text-5xl opacity-80 transition-transform duration-700 group-hover:scale-110"
             style={{ backgroundColor: style.iconBg }}
           >
