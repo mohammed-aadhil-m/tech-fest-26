@@ -9,7 +9,26 @@ import LoadingSpinner from '../components/LoadingSpinner';
 const years = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
 const emptyParticipant = { name: '', email: '', mobile: '', college: '' };
 
-const MAX_EVENTS = 4;
+const EVENT_MAPPING = {
+  'paper-presentation': 'E1',
+  'dev-deploy': 'E2',
+  'treasure-hunt': 'E3',
+  'bug-buster': 'E4',
+  'connect-sketch': 'E5',
+  'adaptune': 'E6'
+};
+
+const COMPATIBILITY_MATRIX = {
+  'E1': ['E4', 'E5', 'E6'],
+  'E2': ['E4', 'E5', 'E6'],
+  'E3': ['E4', 'E5', 'E6'],
+  'E4': ['E1', 'E2', 'E3', 'E6'],
+  'E5': ['E1', 'E2', 'E3', 'E6'],
+  'E6': ['E1', 'E2', 'E3', 'E4', 'E5']
+};
+
+const TECHNICAL_EVENTS = ['E1', 'E2', 'E4'];
+const MAX_EVENTS = 3;
 
 export default function Register() {
   const [searchParams] = useSearchParams();
@@ -50,6 +69,16 @@ export default function Register() {
         toast.error(`You can select a maximum of ${MAX_EVENTS} events.`);
         return prev;
       }
+      
+      const evId = EVENT_MAPPING[slug];
+      const selectedIds = prev.map(s => EVENT_MAPPING[s]).filter(Boolean);
+      const isCompatible = selectedIds.every(id => COMPATIBILITY_MATRIX[id]?.includes(evId));
+      
+      if (!isCompatible) {
+        toast.error('This event is not compatible with your currently selected events.');
+        return prev;
+      }
+
       return [...prev, slug];
     });
     if (errors.events) setErrors(e => ({ ...e, events: '' }));
@@ -99,7 +128,15 @@ export default function Register() {
     if (!form.department.trim()) newErrors.department = 'Department is required';
     if (!form.year) newErrors.year = 'Year of study is required';
     if (!form.foodPreference) newErrors.foodPreference = 'Food preference is required';
-    if (selectedEventSlugs.length === 0) newErrors.events = 'Please select at least one event';
+    if (selectedEventSlugs.length === 0) {
+      newErrors.events = 'Please select at least one event';
+    } else {
+      const selectedIds = selectedEventSlugs.map(s => EVENT_MAPPING[s]).filter(Boolean);
+      const techCount = selectedIds.filter(id => TECHNICAL_EVENTS.includes(id)).length;
+      if (techCount === 0) {
+        newErrors.events = 'You must select at least one technical event';
+      }
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -138,6 +175,10 @@ export default function Register() {
   };
 
   const selectedEventObjects = events.filter(e => selectedEventSlugs.includes(e.slug));
+
+  const selectedIds = selectedEventSlugs.map(s => EVENT_MAPPING[s]).filter(Boolean);
+  const techCount = selectedIds.filter(id => TECHNICAL_EVENTS.includes(id)).length;
+  const isSubmitDisabled = loading || selectedEventSlugs.length === 0 || techCount === 0;
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#FFFDF2' }}>
@@ -252,50 +293,97 @@ export default function Register() {
             <div className="rounded-xl px-4 py-3 mb-5 flex items-start gap-2" style={{ backgroundColor: '#fff0f0', border: '1px solid #ffc1c1' }}>
               <AlertCircle size={15} className="flex-shrink-0 mt-0.5" style={{ color: '#C40001' }} />
               <p className="text-xs" style={{ color: '#8a0000' }}>
-                You can register for up to <strong>{MAX_EVENTS} events</strong>. Click to select or deselect an event.
+                You can register for up to <strong>{MAX_EVENTS} events</strong>. At least <strong>1 Technical event</strong> is required.
               </p>
             </div>
 
             {eventsLoading ? (
               <div className="flex justify-center py-8"><LoadingSpinner /></div>
             ) : (
-              <div className="grid sm:grid-cols-2 gap-3">
-                {events.map(ev => {
-                  const isSelected = selectedEventSlugs.includes(ev.slug);
-                  return (
-                    <button
-                      key={ev.slug}
-                      type="button"
-                      onClick={() => toggleEvent(ev.slug)}
-                      className="p-4 rounded-xl border-2 text-left transition-all duration-150 relative"
-                      style={{
-                        borderColor: isSelected ? '#C40001' : '#E5E5E5',
-                        backgroundColor: isSelected ? '#fff0f0' : '#FFFFFF',
-                      }}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                          style={{ backgroundColor: '#fff0f0', border: '1px solid #ffc1c1' }}
-                        >
-                          <span className="text-xs font-display font-black tracking-tight" style={{ color: '#C40001' }}>{ev.icon}</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold" style={{ color: isSelected ? '#C40001' : '#222222' }}>
-                            {ev.name}
-                          </p>
-                          <p className="text-xs capitalize" style={{ color: '#555555' }}>{ev.category.replace('-', ' ')}</p>
-                        </div>
-                        <div className="flex-shrink-0">
-                          {isSelected
-                            ? <CheckSquare size={18} style={{ color: '#C40001' }} />
-                            : <Square size={18} style={{ color: '#cccccc' }} />
-                          }
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
+              <div className="space-y-6">
+                {/* Selected Events */}
+                {selectedEventSlugs.length > 0 && (
+                  <div>
+                    <p className="text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: '#222222' }}>
+                      <CheckSquare size={16} style={{ color: '#C40001' }} /> Selected Events
+                    </p>
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      {events.filter(ev => selectedEventSlugs.includes(ev.slug)).map(ev => {
+                        const evId = EVENT_MAPPING[ev.slug];
+                        const isTech = TECHNICAL_EVENTS.includes(evId);
+                        return (
+                          <button
+                            key={ev.slug}
+                            type="button"
+                            onClick={() => toggleEvent(ev.slug)}
+                            className="p-4 rounded-xl border-2 text-left transition-all duration-150 relative"
+                            style={{ borderColor: '#C40001', backgroundColor: '#fff0f0' }}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#fff0f0', border: '1px solid #ffc1c1' }}>
+                                <span className="text-xs font-display font-black tracking-tight" style={{ color: '#C40001' }}>{ev.icon}</span>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold" style={{ color: '#C40001' }}>{ev.name}</p>
+                                <p className="text-xs capitalize" style={{ color: '#C40001' }}>
+                                  {isTech ? 'Technical' : 'Non-Technical'} • {ev.category.replace('-', ' ')}
+                                </p>
+                              </div>
+                              <div className="flex-shrink-0">
+                                <CheckSquare size={18} style={{ color: '#C40001' }} />
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Available Events */}
+                {selectedEventSlugs.length < MAX_EVENTS && (
+                  <div>
+                    <p className="text-sm font-semibold mb-3" style={{ color: '#222222' }}>
+                      {selectedEventSlugs.length === 0 ? 'Available Events' : 'Remaining Available Events'}
+                    </p>
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      {events.filter(ev => {
+                        if (selectedEventSlugs.includes(ev.slug)) return false;
+                        const evId = EVENT_MAPPING[ev.slug];
+                        if (!evId) return false;
+                        const selectedIds = selectedEventSlugs.map(s => EVENT_MAPPING[s]).filter(Boolean);
+                        return selectedIds.every(id => COMPATIBILITY_MATRIX[id].includes(evId));
+                      }).map(ev => {
+                        const evId = EVENT_MAPPING[ev.slug];
+                        const isTech = TECHNICAL_EVENTS.includes(evId);
+                        return (
+                          <button
+                            key={ev.slug}
+                            type="button"
+                            onClick={() => toggleEvent(ev.slug)}
+                            className="p-4 rounded-xl border-2 text-left transition-all duration-150 relative hover:border-red-200"
+                            style={{ borderColor: '#E5E5E5', backgroundColor: '#FFFFFF' }}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#fff0f0', border: '1px solid #ffc1c1' }}>
+                                <span className="text-xs font-display font-black tracking-tight" style={{ color: '#C40001' }}>{ev.icon}</span>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold" style={{ color: '#222222' }}>{ev.name}</p>
+                                <p className="text-xs capitalize" style={{ color: '#555555' }}>
+                                  {isTech ? 'Technical' : 'Non-Technical'} • {ev.category.replace('-', ' ')}
+                                </p>
+                              </div>
+                              <div className="flex-shrink-0">
+                                <Plus size={18} style={{ color: '#cccccc' }} />
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
             {errors.events && <p className="form-error mt-2">{errors.events}</p>}
@@ -403,11 +491,10 @@ export default function Register() {
             </div>
           )}
 
-          {/* Submit */}
           <button
             type="submit"
             id="submit-registration"
-            disabled={loading}
+            disabled={isSubmitDisabled}
             className="btn-primary w-full justify-center text-base py-4 shadow-red-md disabled:opacity-50"
           >
             {loading ? (

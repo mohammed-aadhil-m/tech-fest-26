@@ -97,7 +97,7 @@ const stats = [
   { icon: <Code2 size={22} />, label: 'Year', value: '2026' },
 ];
 
-const HERO_WORDS = ["CREATE.", "DECODE.", "INNOVATE.", "COMPETE."];
+const HERO_WORDS = ["CREATE", "DECODE", "INNOVATE", "COMPETE"];
 
 export default function Home() {
   const [settings, setSettings] = useState({});
@@ -124,14 +124,14 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-cream selection:bg-primary-100 selection:text-primary-900 overflow-hidden" style={{ perspective: '1000px' }}>
-      
+
       {/* ── HERO ───────────────────────────────────────── */}
       <section id="home" className="relative min-h-screen flex items-center pt-20 pb-12 overflow-hidden">
         <HeroBackground />
-        
+
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            
+
             {/* Left Column: Text & Content */}
             <motion.div
               variants={containerVariants}
@@ -149,13 +149,13 @@ export default function Home() {
                 </h1>
                 <div className="h-12 sm:h-16 mt-4 flex items-center">
                   <AnimatePresence mode="wait">
-                    <motion.h2 
+                    <motion.h2
                       key={wordIndex}
                       initial={{ y: 20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       exit={{ y: -20, opacity: 0 }}
                       transition={{ duration: 0.3 }}
-                      className="text-3xl sm:text-5xl font-display font-bold" 
+                      className="text-3xl sm:text-5xl font-display font-bold"
                       style={{ color: '#C40001' }}
                     >
                       {HERO_WORDS[wordIndex]}
@@ -192,7 +192,7 @@ export default function Home() {
             </motion.div>
 
             {/* Right Column: Graphic / Image */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.3 }}

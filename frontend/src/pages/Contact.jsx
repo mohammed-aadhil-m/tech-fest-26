@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Mail, Phone } from 'lucide-react';
 import api from '../services/api';
-
 const coordinators = [
   {
     name: 'Coordinator Name 1',
@@ -26,13 +25,14 @@ const coordinators = [
   },
 ];
 
+
 export default function Contact() {
   const [settings, setSettings] = useState({});
 
   useEffect(() => {
     api.get('/settings')
       .then(res => setSettings(res.data.data || {}))
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   return (
@@ -82,30 +82,70 @@ export default function Contact() {
                     </p>
                   </div>
                 </div>
+              </div>
 
-                {settings.contactEmail && (
-                  <div className="flex items-center gap-3">
-                    <Mail size={18} className="flex-shrink-0" style={{ color: '#C40001' }} />
-                    <div>
-                      <p className="text-sm font-medium mb-0.5" style={{ color: '#222222' }}>Email</p>
-                      <a href={`mailto:${settings.contactEmail}`} className="text-sm hover:underline" style={{ color: '#C40001' }}>
-                        {settings.contactEmail}
-                      </a>
-                    </div>
-                  </div>
-                )}
+              <div className="mt-5 pt-4" style={{ borderTop: '1px solid #E5E5E5' }}>
+                <p className="text-xs" style={{ color: '#999999' }}>
+                  Approved By AICTE, New Delhi | Affiliated To Anna University Chennai
+                </p>
+              </div>
+            </div>
 
-                {settings.contactPhone && (
-                  <div className="flex items-center gap-3">
-                    <Phone size={18} className="flex-shrink-0" style={{ color: '#C40001' }} />
-                    <div>
-                      <p className="text-sm font-medium mb-0.5" style={{ color: '#222222' }}>Phone</p>
-                      <a href={`tel:${settings.contactPhone}`} className="text-sm hover:underline" style={{ color: '#C40001' }}>
-                        {settings.contactPhone}
-                      </a>
-                    </div>
+            {/* Organizers */}
+            <div className="card p-6">
+              <h3 className="font-display font-bold mb-4 text-base" style={{ color: '#222222' }}>Event Organizers</h3>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: '#fff0f0' }}>
+                    <span className="font-bold" style={{ color: '#C40001' }}>C</span>
                   </div>
-                )}
+                  <div>
+                    <p className="text-sm font-medium mb-0.5" style={{ color: '#222222' }}>Event Convener</p>
+                    <p className="text-sm leading-relaxed" style={{ color: '#555555' }}>
+                      Dr. I. Muthu Lakshmi<br />
+                      HOD of CSE
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 mt-4">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: '#fff0f0' }}>
+                    <span className="font-bold" style={{ color: '#C40001' }}>S</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium mb-0.5" style={{ color: '#222222' }}>Staff Coordinator</p>
+                    <p className="text-sm leading-relaxed" style={{ color: '#555555' }}>
+                      Dr. G. Sumilda Merlin<br />
+                      AP of CSE
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 mt-4">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: '#fff0f0' }}>
+                    <span className="font-bold" style={{ color: '#C40001' }}>S</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium mb-0.5" style={{ color: '#222222' }}>Staff Coordinator</p>
+                    <p className="text-sm leading-relaxed" style={{ color: '#555555' }}>
+                      Mrs. E. Evelyn Tabitha<br />
+                      AP of CSE
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 mt-4">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: '#fff0f0' }}>
+                    <span className="font-bold" style={{ color: '#C40001' }}>S</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium mb-0.5" style={{ color: '#222222' }}>Staff Coordinator</p>
+                    <p className="text-sm leading-relaxed" style={{ color: '#555555' }}>
+                      Mrs. M. Nithya<br />
+                      AP of CSE
+                    </p>
+                  </div>
+                </div>
               </div>
 
               <div className="mt-5 pt-4" style={{ borderTop: '1px solid #E5E5E5' }}>
@@ -223,9 +263,9 @@ export default function Contact() {
               </div>
             </div>
 
-            {/* Coordinators */}
+            {/* Student Coordinators */}
             <div className="card p-6">
-              <h3 className="font-display font-bold mb-4 text-base" style={{ color: '#222222' }}>Event Coordinators</h3>
+              <h3 className="font-display font-bold mb-4 text-base" style={{ color: '#222222' }}>Student Coordinators</h3>
               <div className="space-y-4">
                 {coordinators.map((c, i) => (
                   <div key={i} className="flex items-start gap-3 pb-4 last:pb-0" style={{ borderBottom: i < coordinators.length - 1 ? '1px solid #E5E5E5' : 'none' }}>
@@ -261,8 +301,7 @@ export default function Contact() {
                   </div>
                 ))}
               </div>
-            </div>
-          </motion.div>
+            </div>          </motion.div>
         </div>
       </div>
     </div>
