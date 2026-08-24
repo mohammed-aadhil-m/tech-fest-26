@@ -10,7 +10,7 @@ const coordinators = [
   },
   {
     name: 'Mr.Ranjith Kumar R',
-    phone: '+91 6382323566',
+    phone: '+91 6382323556',
   },
   {
     name: 'Ms.Arockia Varsha M',
