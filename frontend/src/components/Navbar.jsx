@@ -53,7 +53,6 @@ export default function Navbar() {
   const checkIsActive = (linkTo) => {
     if (linkTo.startsWith('/#')) {
       const sectionId = linkTo.substring(2);
-      // If we are on the home page, use the scrollspy activeSection
       if (location.pathname === '/') {
         return activeSection === sectionId || (sectionId === 'home' && activeSection === '');
       }
@@ -65,69 +64,67 @@ export default function Navbar() {
     return location.pathname.startsWith(linkTo);
   };
 
-  const isSolid = location.pathname !== '/' || scrolled;
-
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isSolid ? 'shadow-md bg-[#C40001]/95 backdrop-blur-md' : 'bg-transparent'
+      className={`fixed top-0 left-0 right-0 w-full z-50 transition-all duration-500 border-b ${scrolled ? 'bg-[#050505]/90 backdrop-blur-xl border-red-500/20 shadow-[0_4px_30px_rgba(255,42,42,0.15)] py-3' : 'bg-transparent border-transparent py-5'
         }`}
     >
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-12">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group flex-shrink-0">
-            <img 
-              src="/college-logo.jpg" 
-              alt="VV College Logo" 
-              className="w-10 h-10 rounded-full object-cover border border-white/30"
-            />
+            <div className="relative">
+              <div className="absolute inset-0 bg-red-500 rounded-full blur opacity-40 group-hover:opacity-70 transition-opacity"></div>
+              <img 
+                src="/college-logo.jpg" 
+                alt="VV College Logo" 
+                className="relative w-10 h-10 rounded-full object-cover border-2 border-white/20 z-10"
+              />
+            </div>
             <div className="hidden sm:block">
-              <p className="text-xs font-medium uppercase tracking-wider leading-none" style={isSolid ? { color: 'rgba(255,255,255,0.8)' } : { color: 'rgba(0,0,0,0.6)' }}>
-                V V College of Engineering
+              <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400 leading-none mb-1">
+                VV College of Engg
               </p>
-              <p className={`text-sm font-display font-bold leading-tight ${isSolid ? 'text-white' : 'text-gray-900'}`}>
-                TECH FEST <span style={{ color: isSolid ? '#FFFDF2' : '#C40001' }}>'26</span>
+              <p className="text-lg font-display font-black leading-tight text-white tracking-wide flex items-center gap-1">
+                TECH FEST <span className="text-red-500">'26</span>
               </p>
             </div>
           </Link>
 
           {/* Desktop Nav Links */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-2">
             {navLinks.map(link => {
               const isActive = checkIsActive(link.to);
               return (
                 <Link
                   key={link.to}
                   to={link.to}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${isActive
-                      ? (isSolid ? 'bg-white/20 text-white font-semibold' : 'bg-[#C40001]/10 text-[#C40001] font-semibold')
-                      : (isSolid ? 'text-white/80 hover:bg-white/10 hover:text-white' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900')
+                  className={`relative px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 group ${isActive
+                      ? 'text-white'
+                      : 'text-gray-400 hover:text-white'
                     }`}
                 >
                   {link.label}
+                  {/* Hover/Active Underline */}
+                  <span className={`absolute bottom-0 left-0 h-0.5 bg-red-500 rounded-full transition-all duration-300 ${isActive ? 'w-full shadow-[0_0_8px_rgba(255,42,42,0.8)]' : 'w-0 group-hover:w-full'}`}></span>
                 </Link>
               );
             })}
           </div>
 
           {/* Right: Register CTA + Mobile toggle */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <Link
               to="/register"
-              className="hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-lg transition-all duration-300"
-              style={{ backgroundColor: '#FFFFFF', color: '#C40001' }}
-              onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#FFFDF2'; }}
-              onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#FFFFFF'; }}
+              className="hidden sm:inline-flex items-center gap-2 text-sm font-bold px-5 py-2.5 rounded-xl transition-all duration-300 bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-white hover:shadow-[0_0_15px_rgba(255,42,42,0.5)]"
             >
-              <span className="whitespace-nowrap flex items-center gap-1.5">
-                Register Now
-                <ChevronRight size={15} />
-              </span>
+              <span>Register Now</span>
+              <ChevronRight size={16} />
             </Link>
 
             {/* Mobile menu toggle */}
             <button
-              className={`md:hidden p-2 rounded-lg transition-all ${isSolid ? 'text-white/80 hover:bg-white/10 hover:text-white' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'}`}
+              className="md:hidden p-2 rounded-xl text-gray-300 hover:bg-white/10 hover:text-white transition-all bg-black/40 border border-white/5 backdrop-blur-md"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Toggle menu"
             >
@@ -138,7 +135,8 @@ export default function Navbar() {
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div className="md:hidden border-t pb-4 pt-2" style={{ borderColor: isSolid ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)' }}>
+          <div className="md:hidden mt-4 bg-black/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-4 shadow-2xl flex flex-col gap-2 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-full blur-3xl -z-10"></div>
             {navLinks.map(link => {
               const isActive = checkIsActive(link.to);
               return (
@@ -146,9 +144,9 @@ export default function Navbar() {
                   key={link.to}
                   to={link.to}
                   onClick={() => setMobileOpen(false)}
-                  className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 mx-1 mb-1 ${isActive
-                      ? (isSolid ? 'bg-white/20 text-white font-semibold' : 'bg-[#C40001]/10 text-[#C40001] font-semibold')
-                      : (isSolid ? 'text-white/80 hover:bg-white/10 hover:text-white' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900')
+                  className={`block px-5 py-3 rounded-xl text-base font-semibold transition-all duration-300 ${isActive
+                      ? 'bg-red-500/10 text-red-400 border border-red-500/20'
+                      : 'text-gray-300 hover:bg-white/5 hover:text-white'
                     }`}
                 >
                   {link.label}
@@ -158,10 +156,9 @@ export default function Navbar() {
             <Link
               to="/register"
               onClick={() => setMobileOpen(false)}
-              className="flex items-center gap-1.5 mx-1 mt-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all"
-              style={{ backgroundColor: '#FFFFFF', color: '#C40001' }}
+              className="flex justify-center items-center gap-2 mt-2 px-5 py-3.5 rounded-xl text-base font-bold transition-all bg-gradient-to-r from-red-600 to-red-500 text-white shadow-lg"
             >
-              Register Now <ChevronRight size={15} />
+              Register Now <ChevronRight size={18} />
             </Link>
           </div>
         )}

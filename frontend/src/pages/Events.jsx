@@ -18,7 +18,7 @@ export default function Events() {
   }, []);
 
   const tabs = [
-    { id: 'all', label: 'All Events' },
+    { id: 'all', label: 'All Protocols' },
     { id: 'technical', label: 'Technical' },
     { id: 'non-technical', label: 'Non-Technical' },
   ];
@@ -31,40 +31,43 @@ export default function Events() {
   const nonTechnical = events.filter(e => e.category === 'non-technical' || e.category === 'coming-soon');
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#050505] selection:bg-red-500/30 selection:text-white">
       {/* Hero */}
-      <div className="border-b py-16 circuit-bg" style={{ backgroundColor: '#FFFDF2', borderColor: '#E5E5E5' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="relative border-b border-white/5 py-24 overflow-hidden">
+        <div className="absolute inset-0 bg-[#0a0a0c]"></div>
+        <div className="absolute inset-0 circuit-bg opacity-30"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-red-500/10 blur-[100px] rounded-full"></div>
+        
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.8 }}
           >
-            <span className="badge badge-technical mb-4">TECH FEST '26</span>
-            <h1 className="text-4xl md:text-5xl font-display font-black text-gray-900 mb-4">
-              All <span className="text-gradient-red">Events</span>
+            <span className="badge badge-technical mb-6">TECH FEST '26</span>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-display font-black text-white mb-6">
+              Active <span className="text-gradient-red">Protocols</span>
             </h1>
-            <p className="text-gray-500 max-w-xl mx-auto">
-              Explore all technical and non-technical events. Register to participate and win exciting prizes.
+            <p className="text-gray-400 max-w-xl mx-auto text-lg font-light leading-relaxed">
+              Explore all technical and non-technical events. Initialize your registration to participate and claim victory.
             </p>
           </motion.div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="sticky top-0 z-40 shadow-sm" style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid #E5E5E5' }}>
+      <div className="sticky top-0 z-40 bg-black/80 backdrop-blur-xl border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-1 py-2 overflow-x-auto no-scrollbar">
+          <div className="flex gap-2 py-4 overflow-x-auto no-scrollbar justify-start sm:justify-center">
             {tabs.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className="flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium transition-all duration-150"
-                style={{
-                  backgroundColor: activeTab === tab.id ? '#C40001' : 'transparent',
-                  color: activeTab === tab.id ? '#FFFFFF' : '#555555',
-                  boxShadow: activeTab === tab.id ? '0 2px 8px rgba(196,0,1,0.2)' : 'none',
-                }}
+                className={`flex-shrink-0 px-6 py-2.5 rounded-xl text-sm font-bold tracking-wide transition-all duration-300 ${
+                  activeTab === tab.id
+                    ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(255,42,42,0.6)] border border-red-500/50'
+                    : 'bg-white/5 text-gray-400 hover:text-white border border-white/10 hover:border-white/20 hover:bg-white/10'
+                }`}
               >
                 {tab.label}
               </button>
@@ -73,24 +76,26 @@ export default function Events() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         {loading ? (
           <div className="flex justify-center py-24"><LoadingSpinner size="xl" /></div>
         ) : (
-          <>
+          <div className="relative">
+            <div className="absolute inset-0 grid-bg opacity-10 pointer-events-none"></div>
+            
             {/* Technical Events */}
             {(activeTab === 'all' || activeTab === 'technical') && technical.length > 0 && (
-              <div className="mb-16">
-                <div className="flex items-center gap-3 mb-8">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#fff0f0' }}>
-                    <Zap size={20} style={{ color: '#C40001' }} />
+              <div className="mb-24 relative z-10">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-12">
+                  <div className="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center glow-red flex-shrink-0">
+                    <Zap size={24} className="text-red-500" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-display font-bold" style={{ color: '#222222' }}>Technical Events</h2>
-                    <p className="text-sm" style={{ color: '#555555' }}>Showcase your coding and technical expertise</p>
+                    <h2 className="text-3xl font-display font-bold text-white mb-2">Technical Execution</h2>
+                    <p className="text-gray-400 font-light text-lg">Showcase your coding and technical mastery</p>
                   </div>
                 </div>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {technical.map((event, i) => <EventCard key={event._id} event={event} index={i} />)}
                 </div>
               </div>
@@ -98,28 +103,31 @@ export default function Events() {
 
             {/* Non-Technical Events */}
             {(activeTab === 'all' || activeTab === 'non-technical') && nonTechnical.length > 0 && (
-              <div>
-                <div className="flex items-center gap-3 mb-8">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#fff8f0' }}>
-                    <Sparkles size={20} style={{ color: '#8a3000' }} />
+              <div className="relative z-10">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-12">
+                  <div className="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center glow-red flex-shrink-0">
+                    <Sparkles size={24} className="text-red-500" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-display font-bold" style={{ color: '#222222' }}>Non-Technical Events</h2>
-                    <p className="text-sm" style={{ color: '#555555' }}>Fun, creative, and team-based challenges</p>
+                    <h2 className="text-3xl font-display font-bold text-white mb-2">Non-Technical Engagement</h2>
+                    <p className="text-gray-400 font-light text-lg">Fun, creative, and team-based challenges</p>
                   </div>
                 </div>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {nonTechnical.map((event, i) => <EventCard key={event._id} event={event} index={i} />)}
                 </div>
               </div>
             )}
 
             {filtered.length === 0 && (
-              <div className="text-center py-24 text-gray-400">
-                <p className="text-lg font-medium">No events found</p>
+              <div className="text-center py-32 relative z-10">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/5 border border-white/10 mb-6 text-gray-600">
+                  <Zap size={32} />
+                </div>
+                <p className="text-xl font-display font-bold text-gray-400">No protocols found matching this criteria.</p>
               </div>
             )}
-          </>
+          </div>
         )}
       </div>
     </div>

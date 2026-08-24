@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Trash2, User, Mail, Phone, Building2, BookOpen, GraduationCap, Users, CheckSquare, Square, AlertCircle } from 'lucide-react';
+import { Plus, Trash2, User, Mail, Phone, Building2, BookOpen, GraduationCap, Users, CheckSquare, Square, AlertCircle, Sparkles } from 'lucide-react';
 import api from '../services/api';
 import { useToast } from '../context/ToastContext';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -181,133 +181,149 @@ export default function Register() {
   const isSubmitDisabled = loading || selectedEventSlugs.length === 0 || techCount === 0;
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#FFFDF2' }}>
+    <div className="min-h-screen bg-[#050505] selection:bg-red-500/30 selection:text-white">
       {/* Header */}
-      <div className="border-b py-12 circuit-bg" style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E5E5' }}>
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <span className="badge badge-technical mb-4">TECH FEST '26</span>
-            <h1 className="text-4xl font-display font-black mb-2" style={{ color: '#222222' }}>
-              Event <span className="text-gradient-red">Registration</span>
+      <div className="relative border-b border-white/5 py-20 overflow-hidden">
+        <div className="absolute inset-0 bg-[#0a0a0c]"></div>
+        <div className="absolute inset-0 circuit-bg opacity-30"></div>
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-red-500/10 blur-[120px] rounded-full pointer-events-none"></div>
+        
+        <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+            <span className="badge badge-technical mb-6">TECH FEST '26</span>
+            <h1 className="text-5xl md:text-6xl font-display font-black mb-4 text-white">
+              Event <span className="text-gradient-red">Initialization</span>
             </h1>
-            <p style={{ color: '#555555' }}>Select up to {MAX_EVENTS} events and fill in your details</p>
-            <div className="mt-5 flex justify-center">
-              <span className="badge badge-technical text-base px-5 py-2 flex items-center gap-2 shadow-sm">
-                Registration Fee: <strong className="text-xl text-gradient-red">₹250</strong> <span className="text-sm">per head</span>
+            <p className="text-gray-400 text-lg font-light">Select up to {MAX_EVENTS} protocols and encrypt your data</p>
+            <div className="mt-8 flex justify-center">
+              <span className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-red-500/10 border border-red-500/30 glow-red">
+                <Sparkles size={20} className="text-red-500" />
+                <span className="text-white font-medium tracking-wide">Processing Fee:</span>
+                <strong className="text-2xl text-red-500 font-display font-black tracking-widest">₹250</strong>
+                <span className="text-xs text-red-400 uppercase tracking-widest">/ Node</span>
               </span>
             </div>
           </motion.div>
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative">
+        <div className="absolute inset-0 grid-bg opacity-10 pointer-events-none"></div>
+
         <motion.form
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.1, duration: 0.6 }}
           onSubmit={handleSubmit}
-          className="space-y-6"
+          className="space-y-8 relative z-10"
           noValidate
         >
           {/* Participant Details */}
-          <div className="card p-6">
-            <h2 className="text-xl font-display font-bold mb-5 flex items-center gap-2" style={{ color: '#222222' }}>
-              <User size={20} style={{ color: '#C40001' }} /> Participant Details
+          <div className="card bg-black/60 border border-white/10 p-8 backdrop-blur-xl">
+            <h2 className="text-2xl font-display font-bold mb-8 flex items-center gap-3 text-white">
+              <div className="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center glow-red text-red-500">
+                <User size={20} />
+              </div>
+              Operative Profile
             </h2>
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-2 gap-6">
               <div className="sm:col-span-2">
-                <label className="form-label">Full Name *</label>
-                <input type="text" id="fullName" className={`form-input ${errors.fullName ? 'border-red-400' : ''}`}
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Designation (Full Name) *</label>
+                <input type="text" id="fullName" className={`w-full bg-white/5 border ${errors.fullName ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-white/20'} rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all`}
                   placeholder="Enter your full name" value={form.fullName}
                   onChange={e => handleChange('fullName', e.target.value)} />
-                {errors.fullName && <p className="form-error">{errors.fullName}</p>}
+                {errors.fullName && <p className="text-xs text-red-500 mt-2 font-medium">{errors.fullName}</p>}
               </div>
               <div>
-                <label className="form-label">Email Address *</label>
-                <input type="email" id="email" className={`form-input ${errors.email ? 'border-red-400' : ''}`}
-                  placeholder="your@email.com" value={form.email}
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Comm Link (Email) *</label>
+                <input type="email" id="email" className={`w-full bg-white/5 border ${errors.email ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-white/20'} rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all`}
+                  placeholder="operative@network.com" value={form.email}
                   onChange={e => handleChange('email', e.target.value)} />
-                {errors.email && <p className="form-error">{errors.email}</p>}
+                {errors.email && <p className="text-xs text-red-500 mt-2 font-medium">{errors.email}</p>}
               </div>
               <div>
-                <label className="form-label">Mobile Number *</label>
-                <input type="tel" id="mobile" className={`form-input ${errors.mobile ? 'border-red-400' : ''}`}
-                  placeholder="10-digit mobile number" value={form.mobile}
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Comlink ID (Mobile) *</label>
+                <input type="tel" id="mobile" className={`w-full bg-white/5 border ${errors.mobile ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-white/20'} rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all`}
+                  placeholder="10-digit sequence" value={form.mobile}
                   onChange={e => handleChange('mobile', e.target.value)} />
-                {errors.mobile && <p className="form-error">{errors.mobile}</p>}
+                {errors.mobile && <p className="text-xs text-red-500 mt-2 font-medium">{errors.mobile}</p>}
               </div>
               <div>
-                <label className="form-label">College Name *</label>
-                <input type="text" id="college" className={`form-input ${errors.college ? 'border-red-400' : ''}`}
-                  placeholder="College name" value={form.college}
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Base of Operations (College) *</label>
+                <input type="text" id="college" className={`w-full bg-white/5 border ${errors.college ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-white/20'} rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all`}
+                  placeholder="Academy Name" value={form.college}
                   onChange={e => handleChange('college', e.target.value)} />
-                {errors.college && <p className="form-error">{errors.college}</p>}
+                {errors.college && <p className="text-xs text-red-500 mt-2 font-medium">{errors.college}</p>}
               </div>
               <div>
-                <label className="form-label">Department *</label>
-                <input type="text" id="department" className={`form-input ${errors.department ? 'border-red-400' : ''}`}
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Division (Department) *</label>
+                <input type="text" id="department" className={`w-full bg-white/5 border ${errors.department ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-white/20'} rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all`}
                   placeholder="e.g. Computer Science" value={form.department}
                   onChange={e => handleChange('department', e.target.value)} />
-                {errors.department && <p className="form-error">{errors.department}</p>}
+                {errors.department && <p className="text-xs text-red-500 mt-2 font-medium">{errors.department}</p>}
               </div>
               <div>
-                <label className="form-label">Year of Study *</label>
-                <select id="year" className={`form-input ${errors.year ? 'border-red-400' : ''}`}
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Experience Level (Year) *</label>
+                <select id="year" className={`w-full bg-white/5 border ${errors.year ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-white/20'} rounded-xl px-4 py-3 text-white focus:outline-none focus:bg-[#111] transition-all appearance-none`}
                   value={form.year} onChange={e => handleChange('year', e.target.value)}>
-                  <option value="">Select year</option>
-                  {years.map(y => <option key={y} value={y}>{y}</option>)}
+                  <option value="" className="bg-black text-gray-500">Select parameter</option>
+                  {years.map(y => <option key={y} value={y} className="bg-black text-white">{y}</option>)}
                 </select>
-                {errors.year && <p className="form-error">{errors.year}</p>}
+                {errors.year && <p className="text-xs text-red-500 mt-2 font-medium">{errors.year}</p>}
               </div>
               <div>
-                <label className="form-label">Food Preference *</label>
-                <select id="foodPreference" className={`form-input ${errors.foodPreference ? 'border-red-400' : ''}`}
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Fuel Type (Diet) *</label>
+                <select id="foodPreference" className={`w-full bg-white/5 border ${errors.foodPreference ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-white/20'} rounded-xl px-4 py-3 text-white focus:outline-none focus:bg-[#111] transition-all appearance-none`}
                   value={form.foodPreference} onChange={e => handleChange('foodPreference', e.target.value)}>
-                  <option value="">Select food preference</option>
-                  <option value="Veg">Veg</option>
-                  <option value="Non-Veg">Non-Veg</option>
+                  <option value="" className="bg-black text-gray-500">Select parameter</option>
+                  <option value="Veg" className="bg-black text-white">Veg</option>
+                  <option value="Non-Veg" className="bg-black text-white">Non-Veg</option>
                 </select>
-                {errors.foodPreference && <p className="form-error">{errors.foodPreference}</p>}
+                {errors.foodPreference && <p className="text-xs text-red-500 mt-2 font-medium">{errors.foodPreference}</p>}
               </div>
             </div>
           </div>
 
           {/* Event Selection (multi-select) */}
-          <div className="card p-6">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-xl font-display font-bold flex items-center gap-2" style={{ color: '#222222' }}>
-                <BookOpen size={20} style={{ color: '#C40001' }} /> Select Events *
+          <div className="card bg-black/60 border border-white/10 p-8 backdrop-blur-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+              <h2 className="text-2xl font-display font-bold flex items-center gap-3 text-white">
+                <div className="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center glow-red text-red-500">
+                  <BookOpen size={20} />
+                </div>
+                Protocol Selection *
               </h2>
               <span
-                className="text-xs font-semibold px-3 py-1 rounded-full"
+                className="text-xs font-bold px-4 py-2 rounded-lg border uppercase tracking-wider whitespace-nowrap"
                 style={{
-                  backgroundColor: selectedEventSlugs.length >= MAX_EVENTS ? '#C40001' : '#fff0f0',
-                  color: selectedEventSlugs.length >= MAX_EVENTS ? '#FFFFFF' : '#C40001',
+                  backgroundColor: selectedEventSlugs.length >= MAX_EVENTS ? 'rgba(255,42,42,0.1)' : 'rgba(255,255,255,0.05)',
+                  color: selectedEventSlugs.length >= MAX_EVENTS ? '#ff2a2a' : '#888',
+                  borderColor: selectedEventSlugs.length >= MAX_EVENTS ? 'rgba(255,42,42,0.3)' : 'rgba(255,255,255,0.1)'
                 }}
               >
-                {selectedEventSlugs.length} / {MAX_EVENTS} selected
+                {selectedEventSlugs.length} / {MAX_EVENTS} Active
               </span>
             </div>
 
             {/* Info note */}
-            <div className="rounded-xl px-4 py-3 mb-5 flex items-start gap-2" style={{ backgroundColor: '#fff0f0', border: '1px solid #ffc1c1' }}>
-              <AlertCircle size={15} className="flex-shrink-0 mt-0.5" style={{ color: '#C40001' }} />
-              <p className="text-xs" style={{ color: '#8a0000' }}>
-                You can register for up to <strong>{MAX_EVENTS} events</strong>. At least <strong>1 Technical event</strong> is required.
+            <div className="rounded-xl px-5 py-4 mb-8 flex items-start gap-3 bg-red-500/5 border border-red-500/20">
+              <AlertCircle size={18} className="flex-shrink-0 mt-0.5 text-red-500" />
+              <p className="text-sm font-light leading-relaxed text-gray-300">
+                You can initialize up to <strong className="text-white">{MAX_EVENTS} protocols</strong>. At least <strong className="text-white">1 Technical execution</strong> is required to proceed.
               </p>
             </div>
 
             {eventsLoading ? (
-              <div className="flex justify-center py-8"><LoadingSpinner /></div>
+              <div className="flex justify-center py-12"><LoadingSpinner /></div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-8">
                 {/* Selected Events */}
                 {selectedEventSlugs.length > 0 && (
                   <div>
-                    <p className="text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: '#222222' }}>
-                      <CheckSquare size={16} style={{ color: '#C40001' }} /> Selected Events
+                    <p className="text-xs font-bold uppercase tracking-wider mb-4 flex items-center gap-2 text-white">
+                      <CheckSquare size={14} className="text-red-500" /> Active Executions
                     </p>
-                    <div className="grid sm:grid-cols-2 gap-3">
+                    <div className="grid sm:grid-cols-2 gap-4">
                       {events.filter(ev => selectedEventSlugs.includes(ev.slug)).map(ev => {
                         const evId = EVENT_MAPPING[ev.slug];
                         const isTech = TECHNICAL_EVENTS.includes(evId);
@@ -316,21 +332,22 @@ export default function Register() {
                             key={ev.slug}
                             type="button"
                             onClick={() => toggleEvent(ev.slug)}
-                            className="p-4 rounded-xl border-2 text-left transition-all duration-150 relative"
-                            style={{ borderColor: '#C40001', backgroundColor: '#fff0f0' }}
+                            className="p-5 rounded-2xl border text-left transition-all duration-300 relative bg-red-500/10 border-red-500/50 shadow-[0_0_15px_rgba(255,42,42,0.15)] overflow-hidden group"
                           >
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#fff0f0', border: '1px solid #ffc1c1' }}>
-                                <span className="text-xs font-display font-black tracking-tight" style={{ color: '#C40001' }}>{ev.icon}</span>
+                            <div className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500/5 to-red-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                            
+                            <div className="flex items-center gap-4 relative z-10">
+                              <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-black/50 border border-red-500/30">
+                                <span className="text-2xl font-display text-red-500">{ev.icon}</span>
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold" style={{ color: '#C40001' }}>{ev.name}</p>
-                                <p className="text-xs capitalize" style={{ color: '#C40001' }}>
-                                  {isTech ? 'Technical' : 'Non-Technical'} • {ev.category.replace('-', ' ')}
+                                <p className="text-base font-bold text-white mb-1">{ev.name}</p>
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-red-400">
+                                  {isTech ? 'Technical' : 'Non-Technical'}
                                 </p>
                               </div>
                               <div className="flex-shrink-0">
-                                <CheckSquare size={18} style={{ color: '#C40001' }} />
+                                <CheckSquare size={20} className="text-red-500" />
                               </div>
                             </div>
                           </button>
@@ -343,10 +360,10 @@ export default function Register() {
                 {/* Available Events */}
                 {selectedEventSlugs.length < MAX_EVENTS && (
                   <div>
-                    <p className="text-sm font-semibold mb-3" style={{ color: '#222222' }}>
-                      {selectedEventSlugs.length === 0 ? 'Available Events' : 'Remaining Available Events'}
+                    <p className="text-xs font-bold uppercase tracking-wider mb-4 text-gray-500">
+                      {selectedEventSlugs.length === 0 ? 'Available Protocols' : 'Remaining Protocols'}
                     </p>
-                    <div className="grid sm:grid-cols-2 gap-3">
+                    <div className="grid sm:grid-cols-2 gap-4">
                       {events.filter(ev => {
                         if (selectedEventSlugs.includes(ev.slug)) return false;
                         const evId = EVENT_MAPPING[ev.slug];
@@ -361,21 +378,20 @@ export default function Register() {
                             key={ev.slug}
                             type="button"
                             onClick={() => toggleEvent(ev.slug)}
-                            className="p-4 rounded-xl border-2 text-left transition-all duration-150 relative hover:border-red-200"
-                            style={{ borderColor: '#E5E5E5', backgroundColor: '#FFFFFF' }}
+                            className="p-5 rounded-2xl border text-left transition-all duration-300 relative bg-white/5 border-white/10 hover:border-white/30 hover:bg-white/10 group"
                           >
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#fff0f0', border: '1px solid #ffc1c1' }}>
-                                <span className="text-xs font-display font-black tracking-tight" style={{ color: '#C40001' }}>{ev.icon}</span>
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-black/50 border border-white/10 group-hover:border-white/30 transition-colors">
+                                <span className="text-2xl font-display grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500">{ev.icon}</span>
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold" style={{ color: '#222222' }}>{ev.name}</p>
-                                <p className="text-xs capitalize" style={{ color: '#555555' }}>
-                                  {isTech ? 'Technical' : 'Non-Technical'} • {ev.category.replace('-', ' ')}
+                                <p className="text-base font-bold text-gray-300 group-hover:text-white transition-colors mb-1">{ev.name}</p>
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-gray-400 transition-colors">
+                                  {isTech ? 'Technical' : 'Non-Technical'}
                                 </p>
                               </div>
                               <div className="flex-shrink-0">
-                                <Plus size={18} style={{ color: '#cccccc' }} />
+                                <Plus size={20} className="text-gray-600 group-hover:text-white transition-colors" />
                               </div>
                             </div>
                           </button>
@@ -386,7 +402,7 @@ export default function Register() {
                 )}
               </div>
             )}
-            {errors.events && <p className="form-error mt-2">{errors.events}</p>}
+            {errors.events && <p className="text-xs text-red-500 mt-4 font-medium">{errors.events}</p>}
           </div>
 
           {/* Team Details for each selected team event */}
@@ -397,54 +413,61 @@ export default function Register() {
                 key={ev.slug}
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
-                className="card p-6"
-                style={{ borderLeft: '4px solid #C40001' }}
+                className="card bg-black/60 border border-white/10 p-8 backdrop-blur-xl relative overflow-hidden"
               >
-                <h2 className="text-xl font-display font-bold mb-5 flex items-center gap-2" style={{ color: '#222222' }}>
-                  <Users size={20} style={{ color: '#C40001' }} /> Team Info — {ev.name}
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500 glow-red"></div>
+                
+                <h2 className="text-2xl font-display font-bold mb-8 flex items-center gap-3 text-white">
+                  <div className="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center glow-red text-red-500">
+                    <Users size={20} />
+                  </div>
+                  Squad Configuration — <span className="text-gray-400 font-light">{ev.name}</span>
                 </h2>
-                <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                
+                <div className="grid sm:grid-cols-2 gap-6 mb-8">
                   <div>
-                    <label className="form-label">Team Name *</label>
-                    <input type="text" className="form-input"
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Squad Designation *</label>
+                    <input type="text" className="w-full bg-white/5 border border-white/10 focus:border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all"
                       placeholder="Enter team name" value={team.teamName}
                       onChange={e => setTeam(ev.slug, { teamName: e.target.value })} />
                   </div>
                   <div>
-                    <label className="form-label">Team Leader</label>
-                    <input type="text" className="form-input"
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Squad Leader</label>
+                    <input type="text" className="w-full bg-white/5 border border-white/10 focus:border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all"
                       placeholder="Team leader name" value={team.teamLeader}
                       onChange={e => setTeam(ev.slug, { teamLeader: e.target.value })} />
                   </div>
                 </div>
 
-                <p className="text-sm font-semibold mb-3" style={{ color: '#222222' }}>
-                  Additional Team Members
-                  <span className="text-xs font-normal ml-2" style={{ color: '#555555' }}>
-                    (Max {ev.maxTeamSize - 1} additional members)
+                <div className="flex items-center gap-3 mb-6">
+                  <p className="text-xs font-bold uppercase tracking-wider text-white">
+                    Additional Operatives
+                  </p>
+                  <span className="text-[10px] font-bold px-2 py-1 bg-white/10 rounded-md text-gray-400">
+                    Max {ev.maxTeamSize - 1} Units
                   </span>
-                </p>
-                <div className="space-y-4">
+                </div>
+                
+                <div className="space-y-6">
                   {team.teamMembers.map((member, i) => (
-                    <div key={i} className="rounded-xl p-4" style={{ backgroundColor: '#FFFDF2', border: '1px solid #E5E5E5' }}>
-                      <div className="flex items-center justify-between mb-3">
-                        <p className="text-sm font-medium" style={{ color: '#555555' }}>Member {i + 1}</p>
+                    <div key={i} className="rounded-2xl p-6 bg-black/40 border border-white/5 relative group">
+                      <div className="flex items-center justify-between mb-6">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Unit 0{i + 1}</p>
                         {team.teamMembers.length > 1 && (
                           <button type="button" onClick={() => removeMember(ev.slug, i)}
-                            className="p-1 rounded-lg transition-all"
-                            style={{ color: '#C40001' }}>
-                            <Trash2 size={15} />
+                            className="p-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all">
+                            <Trash2 size={14} />
                           </button>
                         )}
                       </div>
-                      <div className="grid sm:grid-cols-2 gap-3">
-                        <input type="text" className="form-input text-sm" placeholder="Full name"
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <input type="text" className="w-full bg-white/5 border border-white/10 focus:border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all text-sm" placeholder="Full name"
                           value={member.name} onChange={e => handleMemberChange(ev.slug, i, 'name', e.target.value)} />
-                        <input type="email" className="form-input text-sm" placeholder="Email"
+                        <input type="email" className="w-full bg-white/5 border border-white/10 focus:border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all text-sm" placeholder="Email"
                           value={member.email} onChange={e => handleMemberChange(ev.slug, i, 'email', e.target.value)} />
-                        <input type="tel" className="form-input text-sm" placeholder="Mobile"
+                        <input type="tel" className="w-full bg-white/5 border border-white/10 focus:border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all text-sm" placeholder="Mobile"
                           value={member.mobile} onChange={e => handleMemberChange(ev.slug, i, 'mobile', e.target.value)} />
-                        <input type="text" className="form-input text-sm" placeholder="College"
+                        <input type="text" className="w-full bg-white/5 border border-white/10 focus:border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all text-sm" placeholder="College"
                           value={member.college} onChange={e => handleMemberChange(ev.slug, i, 'college', e.target.value)} />
                       </div>
                     </div>
@@ -454,57 +477,35 @@ export default function Register() {
                   <button
                     type="button"
                     onClick={() => addMember(ev.slug, ev.maxTeamSize)}
-                    className="mt-3 flex items-center gap-2 text-sm font-medium transition-colors"
-                    style={{ color: '#C40001' }}
+                    className="mt-6 flex items-center justify-center gap-2 w-full py-4 rounded-xl bg-white/5 border border-white/10 border-dashed text-sm font-bold uppercase tracking-wider text-gray-400 hover:text-white hover:bg-white/10 transition-all"
                   >
                     <Plus size={16} />
-                    Add Another Member
+                    Add Operative Unit
                   </button>
                 )}
               </motion.div>
             );
           })}
 
-          {/* Selected Events Summary */}
-          {selectedEventSlugs.length > 0 && (
-            <div className="card p-4">
-              <p className="text-sm font-semibold mb-3" style={{ color: '#222222' }}>Selected Events Summary</p>
-              <div className="flex flex-wrap gap-2">
-                {selectedEventObjects.map(ev => (
-                  <span
-                    key={ev.slug}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
-                    style={{ backgroundColor: '#fff0f0', color: '#C40001', border: '1px solid #ffc1c1' }}
-                  >
-                    {ev.icon} {ev.name}
-                    <button
-                      type="button"
-                      onClick={() => toggleEvent(ev.slug)}
-                      className="ml-0.5 hover:text-red-800"
-                      style={{ color: '#A80000' }}
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
           <button
             type="submit"
             id="submit-registration"
             disabled={isSubmitDisabled}
-            className="btn-primary w-full justify-center text-base py-4 shadow-red-md disabled:opacity-50"
+            className="w-full relative group overflow-hidden rounded-2xl p-[1px] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? (
-              <>
-                <LoadingSpinner size="sm" />
-                Submitting...
-              </>
-            ) : (
-              `Complete Registration${selectedEventSlugs.length > 1 ? ` (${selectedEventSlugs.length} Events)` : ''}`
-            )}
+            <span className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 opacity-70 group-hover:opacity-100 transition-opacity duration-300"></span>
+            <div className="relative bg-black px-8 py-5 rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 group-hover:bg-black/40">
+              {loading ? (
+                <>
+                  <LoadingSpinner size="sm" />
+                  <span className="text-white font-bold tracking-wider uppercase">Processing...</span>
+                </>
+              ) : (
+                <span className="text-white font-bold tracking-wider uppercase text-lg">
+                  Execute Initialization{selectedEventSlugs.length > 1 ? ` [${selectedEventSlugs.length} Protocols]` : ''}
+                </span>
+              )}
+            </div>
           </button>
         </motion.form>
       </div>

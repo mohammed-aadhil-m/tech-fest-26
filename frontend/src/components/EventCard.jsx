@@ -1,36 +1,38 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Users, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
-// All category styles use VVCOE red palette — no blue, green, or multicolor
 const categoryStyles = {
   technical: {
-    iconBg: '#fff0f0',
-    iconBorder: '#ffc1c1',
-    badge: { bg: '#fff0f0', color: '#C40001', border: '#ffc1c1' },
+    iconBg: '#1a0505',
+    iconBorder: '#ff2a2a',
+    badge: { bg: '#ff2a2a', color: '#ffffff', border: 'transparent' },
     label: 'Technical',
+    glow: 'rgba(255,42,42,0.5)'
   },
   'non-technical': {
-    iconBg: '#fff8f0',
-    iconBorder: '#f5c9a0',
-    badge: { bg: '#fff8f0', color: '#8a3000', border: '#f5c9a0' },
+    iconBg: '#1a0f05',
+    iconBorder: '#ff8a2a',
+    badge: { bg: 'transparent', color: '#ff8a2a', border: '#ff8a2a' },
     label: 'Non-Technical',
+    glow: 'rgba(255,138,42,0.3)'
   },
   'coming-soon': {
-    iconBg: '#FFFDF2',
-    iconBorder: '#e5d5a0',
-    badge: { bg: '#FFFDF2', color: '#7a5500', border: '#e5d5a0' },
-    label: 'Coming Soon',
+    iconBg: '#050505',
+    iconBorder: '#555555',
+    badge: { bg: '#111111', color: '#888888', border: '#333333' },
+    label: 'Locked',
+    glow: 'rgba(255,255,255,0.1)'
   },
 };
 
 const customDescriptions = {
-  'bug-buster': 'Test your technical knowledge, survive the quiz, debug the code, and race to the Top 3! ',
-  'treasure-hunt': 'Scan, solve, search, and race through hidden QR clues to find the final treasure! ',
-  'adaptune': 'Listen, think, guess, and race to identify the song using music clues, creativity, and speed! ',
+  'bug-buster': 'Test your technical knowledge, survive the quiz, debug the code, and race to the Top 3!',
+  'treasure-hunt': 'Scan, solve, search, and race through hidden QR clues to find the final treasure!',
+  'adaptune': 'Listen, think, guess, and race to identify the song using music clues, creativity, and speed!',
   'dev-deploy': 'Build a creative AI-powered website, make it fully functional, deploy it online, and present your live project!',
-  'paper-presentation': 'Present innovative ideas, research, and creative solutions, showcase your technical knowledge, and inspire others with your unique perspective! ',
-  'connect-sketch': 'Connect visual clues, unleash your creativity, sketch technical concepts, and race your teammates to guess the answer! '
+  'paper-presentation': 'Present innovative ideas, research, and creative solutions, showcase your technical knowledge!',
+  'connect-sketch': 'Connect visual clues, unleash your creativity, sketch technical concepts, and race to guess the answer!'
 };
 
 export default function EventCard({ event, index = 0 }) {
@@ -43,13 +45,18 @@ export default function EventCard({ event, index = 0 }) {
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-50px' }}
-      transition={{ duration: 0.4, delay: index * 0.08 }}
-      className="group"
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      className="group relative h-full"
     >
+      <div 
+        className="absolute -inset-0.5 rounded-2xl blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" 
+        style={{ backgroundColor: style.glow, zIndex: -1 }}
+      ></div>
+
       <Link
         to={`/events/${event.slug}`}
-        className="card-hover h-full flex flex-col overflow-hidden bg-white block"
-        style={isComingSoon ? { border: '2px dashed #e5d5a0', cursor: isComingSoon ? 'default' : 'pointer' } : {}}
+        className="card-hover h-full flex flex-col overflow-hidden bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl block relative z-10"
+        style={isComingSoon ? { cursor: 'default', opacity: 0.7 } : {}}
         onClick={(e) => {
           if (isComingSoon) {
             e.preventDefault();
@@ -57,11 +64,13 @@ export default function EventCard({ event, index = 0 }) {
         }}
       >
         {/* Banner Image */}
-        <div className="w-full h-48 sm:h-56 md:h-64 bg-gray-100 relative overflow-hidden flex-shrink-0">
+        <div className="w-full h-48 sm:h-56 bg-[#0a0a0c] relative overflow-hidden flex-shrink-0 border-b border-white/10">
+          <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10 opacity-60"></div>
+          
           <img
             src={`/images/events/${event.slug}.jpg`}
             alt={event.name}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
             onError={(e) => {
               e.target.onerror = null;
               e.target.style.display = 'none';
@@ -70,31 +79,41 @@ export default function EventCard({ event, index = 0 }) {
           />
           <div
             id={`fallback-card-icon-${event.slug}`}
-            className="hidden absolute inset-0 items-center justify-center text-5xl opacity-80 transition-transform duration-700 group-hover:scale-110"
+            className="hidden absolute inset-0 items-center justify-center text-6xl opacity-40 transition-transform duration-700 group-hover:scale-110 group-hover:opacity-80"
             style={{ backgroundColor: style.iconBg }}
           >
             <span style={{ color: style.badge.color }}>{event.icon}</span>
           </div>
+
+          <div className="absolute bottom-4 left-4 z-20">
+            <span
+              className="inline-flex items-center gap-1 px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-md"
+              style={{
+                backgroundColor: style.badge.bg,
+                color: style.badge.color,
+                border: `1px solid ${style.badge.border}`,
+              }}
+            >
+              {style.label}
+            </span>
+          </div>
         </div>
 
         {/* Header Info */}
-        <div className="p-5 flex-1 flex flex-col items-center justify-center text-center border-t border-gray-100 bg-white">
-          <span
-            className="inline-flex items-center gap-1 px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full mb-3"
-            style={{
-              backgroundColor: style.badge.bg,
-              color: style.badge.color,
-              border: `1px solid ${style.badge.border}`,
-            }}
-          >
-            {style.label}
-          </span>
-          <p
-            className="text-sm font-medium leading-relaxed px-2"
-            style={{ color: '#444444' }}
-          >
+        <div className="p-6 flex-1 flex flex-col items-start justify-start text-left bg-gradient-to-b from-white/5 to-transparent">
+          <h3 className="text-xl font-display font-bold text-white mb-3 group-hover:text-red-400 transition-colors">
+            {event.name}
+          </h3>
+          <p className="text-sm font-light leading-relaxed text-gray-400 mb-6 flex-grow">
             {description}
           </p>
+          
+          {!isComingSoon && (
+            <div className="flex items-center gap-2 text-sm font-bold text-red-500 mt-auto group-hover:gap-3 transition-all duration-300">
+              <span>View Details</span>
+              <ChevronRight size={16} />
+            </div>
+          )}
         </div>
       </Link>
     </motion.div>

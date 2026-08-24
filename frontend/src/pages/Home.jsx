@@ -1,25 +1,20 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, Zap, Code2, Trophy, Users, CheckCircle, AlertTriangle } from 'lucide-react';
+import { ChevronRight, Zap, Code2, Trophy, Users, CheckCircle, AlertTriangle, Calendar, Clock, MapPin } from 'lucide-react';
 import api from '../services/api';
 
-// Static hero background (Color #FFFDF2)
+// Immersive Dark Hero Background
 function HeroBackground() {
   return (
-    <div className="absolute inset-0 z-0 bg-[#FFFDF2]">
-      {/* Grid pattern overlay */}
-      <div className="absolute inset-0 grid-bg opacity-10" />
-    </div>
-  );
-}
-
-// Single countdown box
-function CountdownBox({ value, label }) {
-  return (
-    <div className="flex flex-col items-center justify-center w-16 h-16 sm:w-20 sm:h-20 border border-gray-300 rounded-2xl bg-white/60 backdrop-blur-md shadow-sm relative">
-      <span className="text-2xl sm:text-3xl font-display font-bold text-gray-900 leading-none">{String(value).padStart(2, '0')}</span>
-      <span className="text-[9px] sm:text-[10px] font-semibold text-gray-500 uppercase tracking-widest mt-1">{label}</span>
+    <div className="absolute inset-0 z-0 overflow-hidden">
+      <div className="absolute inset-0 bg-[#050505]"></div>
+      {/* Orbital glow effects */}
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-red-500/20 blur-[120px] animate-pulse"></div>
+      <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-red-900/30 blur-[150px]"></div>
+      <div className="absolute inset-0 grid-bg opacity-30" />
+      {/* Vignette */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050505]/50 to-[#050505]"></div>
     </div>
   );
 }
@@ -58,21 +53,24 @@ function Countdown({ targetDate, label }) {
   if (!mounted) return null;
 
   return (
-    <div>
-      <div className="flex items-center gap-2 mb-3">
-        <div className="w-2 h-2 rounded-full bg-[#C40001] animate-pulse" />
-        <p className="text-[10px] font-mono font-bold text-[#C40001] uppercase tracking-widest">{label}</p>
+    <div className="relative z-10">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(255,42,42,0.8)] animate-pulse" />
+        <p className="text-[10px] font-mono font-bold text-red-400 uppercase tracking-[0.2em]">{label}</p>
       </div>
       {!targetDate ? (
         <p className="text-sm text-gray-500 font-medium py-2">Date to be announced</p>
       ) : expired ? (
-        <p className="text-sm font-bold text-[#C40001] py-2">
+        <p className="text-sm font-bold text-red-500 py-2 glow-text">
           {label.includes('Starts') ? 'Event Started!' : 'Registration Closed!'}
         </p>
       ) : (
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-3 sm:gap-4">
           {Object.entries(timeLeft).map(([unit, value]) => (
-            <CountdownBox key={unit} value={value} label={unit} />
+            <div key={unit} className="countdown-box">
+              <span className="countdown-number">{String(value).padStart(2, '0')}</span>
+              <span className="countdown-label">{unit}</span>
+            </div>
           ))}
         </div>
       )}
@@ -87,14 +85,14 @@ const containerVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
 };
 
 const stats = [
-  { icon: <Zap size={22} />, label: 'Technical Events', value: '3' },
-  { icon: <Trophy size={22} />, label: 'Non-Technical Events', value: '3' },
-  { icon: <Users size={22} />, label: 'Departments', value: 'CSE' },
-  { icon: <Code2 size={22} />, label: 'Year', value: '2026' },
+  { icon: <Zap size={24} />, label: 'Technical', value: '3 Events' },
+  { icon: <Trophy size={24} />, label: 'Non-Technical', value: '3 Events' },
+  { icon: <Users size={24} />, label: 'Department', value: 'CSE' },
+  { icon: <Code2 size={24} />, label: 'Edition', value: '2026' },
 ];
 
 const HERO_WORDS = ["CREATE", "DECODE", "INNOVATE", "COMPETE"];
@@ -123,40 +121,78 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-cream selection:bg-primary-100 selection:text-primary-900 overflow-hidden" style={{ perspective: '1000px' }}>
+    <div className="min-h-screen bg-[#050505] selection:bg-red-500/30 selection:text-white overflow-hidden">
 
       {/* ── HERO ───────────────────────────────────────── */}
-      <section id="home" className="relative min-h-screen flex items-center pt-20 pb-12 overflow-hidden">
+      <section id="home" className="relative min-h-screen flex items-center pt-24 pb-12 overflow-hidden">
         <HeroBackground />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-
-            {/* Left Column: Text & Content */}
+          <div className="flex flex-col items-center justify-center text-center max-w-4xl mx-auto">
             <motion.div
               variants={containerVariants}
               initial="hidden"
               animate="visible"
-              className="text-left"
+              className="flex flex-col items-center"
             >
-              {/* Header Info */}
-              <motion.div variants={itemVariants} className="mb-4">
-                <p className="text-[10px] sm:text-xs font-mono font-semibold text-gray-500 tracking-[0.2em] uppercase mb-3">
-                  DEPT. OF CSE · V V COLLEGE OF ENGINEERING
-                </p>
-                <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-black tracking-tight text-gray-900 leading-[0.9]">
-                  TECH FEST <span className="text-[#C40001] block mt-1">'26</span>
+              <motion.div variants={itemVariants} className="mb-8 w-full">
+                <div className="flex items-center justify-between gap-2 sm:gap-4 w-full">
+                  {/* Left: VVCOE Logo */}
+                  <div className="flex-shrink-0 relative">
+                    <div className="absolute inset-0 bg-red-500 rounded-full blur-xl opacity-30"></div>
+                    <img src="/college-logo.jpg" alt="VVCOE Logo" className="relative w-16 h-16 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-white/20 z-10 shadow-[0_0_30px_rgba(255,42,42,0.3)]" />
+                  </div>
+                  
+                  {/* Center: College Details */}
+                  <div className="flex-1 flex flex-col items-center justify-center">
+                    <h2 className="text-lg sm:text-3xl md:text-4xl font-display font-black text-white tracking-widest uppercase mb-1 sm:mb-2 text-shadow-sm text-center leading-tight">
+                      VV College of Engineering
+                    </h2>
+                    <p className="text-[9px] sm:text-[11px] md:text-sm text-gray-400 font-medium max-w-xl leading-relaxed text-center">
+                      (Approved By AICTE, New Delhi and affiliated To Anna University Chennai)<br className="hidden sm:block" />
+                      V V Nagar, Arasoor, Thisayanvilai, Sathankulam Taluk, Tuticorin District - 628 656
+                    </p>
+                  </div>
+
+                  {/* Right: CSI Logo */}
+                  <div className="flex-shrink-0 relative">
+                    <div className="absolute inset-0 bg-blue-500 rounded-full blur-xl opacity-20"></div>
+                    <img src="/csi-logo.png" alt="CSI Logo" className="relative w-16 h-16 sm:w-24 sm:h-24 rounded-full object-contain border border-white/10 z-10 shadow-[0_0_20px_rgba(59,130,246,0.2)] bg-white" />
+                  </div>
+                </div>
+
+                {/* CSI & Dept */}
+                <div className="mt-6 flex flex-col items-center">
+                  <div className="p-4 sm:p-5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-md relative overflow-hidden group shadow-[0_0_20px_rgba(255,255,255,0.02)] max-w-2xl w-full">
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-red-500 glow-red"></div>
+                    <p className="text-[10px] sm:text-xs md:text-sm font-bold text-gray-300 uppercase tracking-widest leading-relaxed text-center">
+                      CSI STUDENTS CHAPTER & DEPARTMENT OF<br/>
+                      <span className="text-red-400 block mt-1">COMPUTER SCIENCE AND ENGINEERING</span>
+                    </p>
+                    <p className="text-[9px] sm:text-[10px] text-gray-500 uppercase tracking-widest mt-2 sm:mt-3 font-mono text-center">Proudly Presents</p>
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div variants={itemVariants} className="mb-8 flex flex-col items-center">
+                <h1 className="text-6xl sm:text-8xl md:text-9xl font-display font-black tracking-tighter text-white leading-[0.9] text-center drop-shadow-2xl">
+                  TECH FEST <span className="text-red-500 glow-text block mt-2">'26</span>
                 </h1>
-                <div className="h-12 sm:h-16 mt-4 flex items-center">
+                
+                <div className="mt-4 sm:mt-6">
+                  <p className="text-sm sm:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-gray-100 to-gray-400 tracking-[0.2em] sm:tracking-[0.25em] uppercase text-center">
+                    N A T I O N A L  L E V E L  S Y M P O S I U M
+                  </p>
+                </div>
+                
+                <div className="h-12 sm:h-16 mt-6 flex items-center justify-center">
                   <AnimatePresence mode="wait">
                     <motion.h2
                       key={wordIndex}
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      exit={{ y: -20, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="text-3xl sm:text-5xl font-display font-bold"
-                      style={{ color: '#C40001' }}
+                      initial={{ y: 20, opacity: 0, filter: 'blur(10px)' }}
+                      animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
+                      exit={{ y: -20, opacity: 0, filter: 'blur(10px)' }}
+                      transition={{ duration: 0.4 }}
+                      className="text-3xl sm:text-5xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-red-300 text-center"
                     >
                       {HERO_WORDS[wordIndex]}
                     </motion.h2>
@@ -164,102 +200,99 @@ export default function Home() {
                 </div>
               </motion.div>
 
-              {/* Tagline / Description */}
-              <motion.div variants={itemVariants} className="mb-8 max-w-lg">
-                <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
-                  A one-day technical symposium where ideas, data and code collide — five events, one campus, upcoming this 2026.
-                </p>
-                <p className="text-[10px] font-mono font-semibold text-gray-400 tracking-[0.15em] uppercase mt-4">
-                  5 EVENTS / 10 ROUNDS / 1 DAY / VVCOE
-                </p>
+              <motion.div variants={itemVariants} className="mb-10 max-w-2xl text-center">
+                <div className="flex flex-wrap justify-center gap-4 mt-2">
+                  <div className="flex items-center gap-2 text-sm text-gray-300 bg-white/5 px-5 py-2.5 rounded-lg border border-white/10 backdrop-blur-sm">
+                    <Calendar size={16} className="text-red-400" />
+                    <span className="font-medium tracking-wide">09 SEP 2026</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-300 bg-white/5 px-5 py-2.5 rounded-lg border border-white/10 backdrop-blur-sm">
+                    <MapPin size={16} className="text-red-400" />
+                    <span className="font-medium tracking-wide">VVCOE Campus</span>
+                  </div>
+                </div>
               </motion.div>
 
-              {/* Countdown Timer */}
-              <motion.div variants={itemVariants} className="mb-10">
-                <Countdown targetDate={settings.eventDate} label="COUNTING DOWN — TECH FEST 2026" />
+              <motion.div variants={itemVariants} className="mb-12 flex justify-center">
+                <Countdown targetDate={settings.eventDate} label="SYSTEM INITIATION IN" />
               </motion.div>
 
-              {/* CTA Buttons */}
-              <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-4">
-                <Link to="/register" className="btn-primary text-sm sm:text-base px-8 py-3 w-full sm:w-auto justify-center shadow-red-md rounded-full">
-                  Register
+              <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
+                <Link to="/register" className="btn-primary w-full sm:w-auto justify-center text-lg px-8 py-4 shadow-[0_0_20px_rgba(255,42,42,0.3)]">
+                  Initialize Registration
                 </Link>
-                <Link to="/events" className="flex items-center justify-center gap-2 text-sm sm:text-base font-semibold text-gray-700 hover:text-[#C40001] transition-colors border border-gray-300 hover:border-[#C40001] px-8 py-3 w-full sm:w-auto rounded-full bg-white/50 backdrop-blur-sm">
-                  Explore events <ChevronRight size={18} />
+                <Link to="/events" className="btn-secondary w-full sm:w-auto justify-center px-8 py-4">
+                  Explore Events <ChevronRight size={18} />
                 </Link>
               </motion.div>
-
             </motion.div>
-
-            {/* Right Column: Graphic / Image */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="hidden lg:flex justify-center items-center relative"
-            >
-              {/* Empty as requested */}
-            </motion.div>
-
           </div>
-        </div>
 
         {/* Scroll indicator */}
         <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 1.5 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1"
+          animate={{ y: [0, 10, 0], opacity: [0.3, 1, 0.3] }}
+          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 cursor-pointer"
+          onClick={() => document.getElementById('about').scrollIntoView({ behavior: 'smooth' })}
         >
-          <div className="w-0.5 h-8 bg-gradient-to-b from-[#C40001] to-transparent rounded-full" />
-          <p className="text-xs text-gray-500 font-medium uppercase tracking-widest">Scroll</p>
+          <div className="w-[1px] h-12 bg-gradient-to-b from-red-500 to-transparent" />
+          <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.2em]">Scroll</p>
         </motion.div>
       </section>
 
       {/* ── ABOUT ───────────────────────────────────────── */}
-      <section id="about" className="py-20" style={{ backgroundColor: '#FFFFFF' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="about" className="py-24 relative">
+        <div className="absolute inset-0 circuit-bg pointer-events-none"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="grid md:grid-cols-2 gap-12 items-center"
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8 }}
+            className="grid lg:grid-cols-2 gap-16 items-center"
           >
             <div>
-              <span className="badge badge-technical mb-4">About TECH FEST '26</span>
-              <h2 className="section-title mb-5">
-                Where Innovation <span className="text-gradient-red">Meets Excellence</span>
+              <span className="badge badge-technical mb-6">About the Fest</span>
+              <h2 className="section-title">
+                Where Innovation <br/><span className="text-gradient-red">Meets Excellence</span>
               </h2>
-              <p className="text-gray-600 leading-relaxed mb-4">
-                TECH FEST '26 is a technical symposium organized by the Department of Computer Science and Engineering, V V College of Engineering.
-              </p>
-              <p className="text-gray-600 leading-relaxed mb-6">
-                The symposium provides students with an opportunity to showcase their technical knowledge, creativity, problem-solving ability, teamwork and innovative thinking through a variety of technical and non-technical events.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Link to="/events" className="btn-primary text-sm">
-                  View Events <ChevronRight size={15} />
+              <div className="w-12 h-1 bg-red-500 mb-8 rounded-full glow-red"></div>
+              
+              <div className="space-y-6 text-gray-400 text-lg font-light leading-relaxed">
+                <p>
+                  TECH FEST '26 is the premier technical symposium organized by the Department of Computer Science and Engineering at V V College of Engineering.
+                </p>
+                <p>
+                  We provide a platform for visionary students to showcase their technical prowess, creativity, problem-solving abilities, and innovative thinking through an intense lineup of events.
+                </p>
+              </div>
+              
+              <div className="flex flex-wrap gap-4 mt-10">
+                <Link to="/events" className="btn-primary text-sm py-3 px-6">
+                  View Schedule <ChevronRight size={16} />
                 </Link>
-                <Link to="/rules" className="btn-secondary text-sm">
-                  Event Rules
+                <Link to="/rules" className="btn-outline text-sm py-3 px-6 border-white/10 hover:border-white/30">
+                  Read Guidelines
                 </Link>
               </div>
             </div>
 
-            {/* Stats Grid on the right side */}
-            <div className="grid grid-cols-2 gap-4">
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 gap-4 sm:gap-6">
               {stats.map((s, i) => (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
+                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className="bg-white/80 backdrop-blur-sm border border-gray-100 rounded-2xl p-6 text-center shadow-card hover:shadow-lg transition-all"
+                  transition={{ delay: i * 0.1 + 0.2, duration: 0.5 }}
+                  className="card-hover flex flex-col items-center justify-center text-center py-10"
                 >
-                  <div className="text-primary-700 flex justify-center mb-2">{s.icon}</div>
-                  <p className="text-3xl font-display font-bold text-gray-900 mb-1">{s.value}</p>
-                  <p className="text-sm text-gray-500 font-medium">{s.label}</p>
+                  <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 mb-4 glow-red">
+                    {s.icon}
+                  </div>
+                  <p className="text-2xl sm:text-3xl font-display font-black text-white mb-1">{s.value}</p>
+                  <p className="text-xs sm:text-sm text-gray-500 font-bold uppercase tracking-wider">{s.label}</p>
                 </motion.div>
               ))}
             </div>
@@ -267,47 +300,58 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
+
       {/* ── SCHEDULE ───────────────────────────────────────── */}
-      <section id="schedule" className="py-20 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="schedule" className="py-24 relative bg-[#0a0a0c]">
+        {/* Subtle top/bottom borders */}
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+        <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+        
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
             <span className="badge badge-technical mb-4">Event Timeline</span>
-            <h2 className="section-title mb-3">
-              Symposium <span className="text-gradient-red">Schedule</span>
+            <h2 className="section-title">
+              Mission <span className="text-gradient-red">Schedule</span>
             </h2>
-            <p className="section-subtitle text-gray-500">
-              Plan your day at TECH FEST '26
+            <p className="section-subtitle">
+              Plan your synchronization at TECH FEST '26
             </p>
           </motion.div>
 
-          <div className="relative border-l-2 border-primary-200 ml-4 md:ml-8">
+          <div className="relative border-l border-red-500/30 ml-4 md:ml-8 space-y-12 pb-8">
             {[
-              { time: '09:00 AM', title: 'Registration & Welcome', desc: 'Check-in and collect your event passes.' },
-              { time: '09:30 AM', title: 'Inauguration', desc: 'Opening ceremony and keynote address.' },
-              { time: '10:30 AM', title: 'Technical Events Start', desc: 'Paper Presentation, Dev & Deploy, Bug Buster.' },
-              { time: '12:30 PM', title: 'Lunch Break', desc: 'Food and refreshments provided.' },
-              { time: '01:30 PM', title: 'Non-Technical Events', desc: 'Treasure Hunt 2.0, Connect & Sketch, Adaptune.' },
-              { time: '03:30 PM', title: 'Valedictory & Prize Distribution', desc: 'Closing ceremony and winner announcements.' },
+              { time: '09:00 AM', title: 'System Boot & Registration', desc: 'Check-in and collect your access protocols.' },
+              { time: '09:30 AM', title: 'Inauguration Sequence', desc: 'Opening ceremony and keynote address from the chiefs.' },
+              { time: '10:30 AM', title: 'Technical Execution Starts', desc: 'Paper Presentation, Dev & Deploy, Bug Buster.' },
+              { time: '12:30 PM', title: 'Cooling Period (Lunch)', desc: 'Recharge your cores. Food and refreshments provided.' },
+              { time: '01:30 PM', title: 'Non-Technical Engagement', desc: 'Treasure Hunt 2.0, Connect & Sketch, Adaptune.' },
+              { time: '03:30 PM', title: 'Valedictory & Rewards', desc: 'Closing ceremony and winner announcements.' },
             ].map((item, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0, x: -30 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="mb-8 relative pl-8"
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
+                className="relative pl-8 sm:pl-12"
               >
-                <div className="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-[#C40001] border-4 border-white shadow" />
-                <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                  <span className="text-[#C40001] font-bold text-sm mb-1 block">{item.time}</span>
-                  <h3 className="text-lg font-display font-bold text-gray-900 mb-2">{item.title}</h3>
-                  <p className="text-gray-600 text-sm">{item.desc}</p>
+                {/* Timeline node */}
+                <div className="absolute -left-[5px] top-1 w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_10px_rgba(255,42,42,0.8)]" />
+                <div className="absolute -left-[9px] top-[0px] w-[11px] h-[11px] rounded-full border border-red-500/50 animate-ping" />
+                
+                <div className="card-hover">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Clock size={14} className="text-red-500" />
+                    <span className="text-red-400 font-mono font-bold text-sm tracking-wide">{item.time}</span>
+                  </div>
+                  <h3 className="text-xl font-display font-bold text-white mb-2">{item.title}</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">{item.desc}</p>
                 </div>
               </motion.div>
             ))}
@@ -316,21 +360,22 @@ export default function Home() {
       </section>
 
       {/* ── RULES ───────────────────────────────────── */}
-      <section id="rules" className="py-20" style={{ backgroundColor: '#FFFDF2' }}>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="rules" className="py-24 relative">
+        <div className="absolute inset-0 grid-bg pointer-events-none opacity-20"></div>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12"
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
           >
-            <span className="badge badge-technical mb-4">TECH FEST '26</span>
-            <h2 className="section-title mb-3">
+            <span className="badge badge-technical mb-4">Protocols</span>
+            <h2 className="section-title">
               Rules &amp; <span className="text-gradient-red">Guidelines</span>
             </h2>
             <p className="section-subtitle">
-              All participants must read and follow these rules. The organizers' decision is final.
+              Strict compliance is required. The administrators' decision is final.
             </p>
           </motion.div>
 
@@ -340,84 +385,36 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="card p-6 mb-6"
-            style={{ borderLeft: '4px solid #C40001' }}
+            className="card mb-8 border-l-2 border-l-red-500 bg-black/60 mx-auto max-w-4xl p-6"
           >
-            <h3 className="text-xl font-display font-bold mb-5" style={{ color: '#222222' }}>General Rules</h3>
-            <ul className="space-y-3">
+            <h3 className="text-lg sm:text-xl font-display font-bold mb-4 text-white flex items-center gap-2">
+              <AlertTriangle className="text-red-500" size={20} />
+              General Directives
+            </h3>
+            <ul className="grid sm:grid-cols-2 gap-3">
               {[
                 'Participants must register before the event.',
-                'Participants must follow event timings and report on time.',
-                'Participants must follow instructions given by coordinators and judges.',
-                'Any form of malpractice or misconduct may lead to immediate disqualification.',
-                'Participants must maintain discipline inside the campus.',
-                'The organizers\' decision will be final in all matters.',
-                'Participants must carry their event pass/registration confirmation on the day of the event.',
-                'Mobile phones must be used only as permitted by the specific event rules.',
-                'Use of unfair means, plagiarism, or copied work will lead to disqualification.',
+                'Follow event timings and report on time.',
+                'Follow instructions given by coordinators and judges.',
+                'Malpractice leads to immediate disqualification.',
+                'Maintain discipline inside the campus.',
+                'The organizers\' decision will be final.',
+                'Mobile phones permitted only as per specific rules.',
+                'Plagiarism or copied work will lead to disqualification.',
               ].map((rule, i) => (
-                <motion.li
+                <li
                   key={i}
-                  initial={{ opacity: 0, x: -10 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.1 + i * 0.04 }}
-                  className="flex items-start gap-3 text-sm"
-                  style={{ color: '#555555' }}
+                  className="flex items-start gap-2 text-xs sm:text-[13px] text-gray-400 bg-white/5 p-2.5 rounded-lg border border-white/5"
                 >
-                  <CheckCircle size={16} className="mt-0.5 flex-shrink-0" style={{ color: '#C40001' }} />
+                  <CheckCircle size={14} className="mt-0.5 flex-shrink-0 text-red-500" />
                   {rule}
-                </motion.li>
+                </li>
               ))}
             </ul>
           </motion.div>
 
-          {/* Event Rules */}
-          <h3 className="text-2xl font-display font-bold mb-5" style={{ color: '#222222' }}>Event-Specific Rules</h3>
-          <div className="space-y-4 mb-8">
-            {[
-              { name: 'Paper Presentation', rules: ['Submit paper before deadline: 04/09/2026 to suyamburaj@gmail.com.', 'Paper must be original and plagiarism-free.', 'Follow the prescribed paper format.', 'Selected participants will be notified via email.', 'Present live on event day within allotted time.'] },
-              { name: 'Dev & Deploy', rules: ['Develop a website using AI assistance.', 'The website must be fully functional and deployed online.', 'Present the live project on the event day.', 'Explain the development process clearly.', 'Plagiarism or copying without significant modification is not allowed.'] },
-              { name: 'Bug Buster', rules: ['Total time: 1 Hour.', 'Round 1 — Technical Quiz: buzzer-based, 3 lives, passing allowed.', 'Round 2 — Debug the Code: fix errors in Java, C, Python files.', 'Compile/run the corrected code successfully.', 'Decision of judges is final.'] },
-              { name: 'Treasure Hunt 2.0', rules: ['Mobile phones are mandatory.', 'Each team receives different puzzles to prevent copying.', 'Do not damage or remove QR codes.', 'The team completing all stages in shortest time wins.'] },
-              { name: 'Connect & Sketch', rules: ['Round 1 (Bioscope): Connect images logically to identify the correct word.', 'Round 2 (Draw & Guess): One member draws; teammates guess without speaking.', 'Words relate to technology and computer science.', 'Any cheating leads to disqualification.'] },
-              { name: 'Adaptune', rules: ['3 Rounds: Humming, Instrumental, and Emoji-based song guessing.', 'Answers must be submitted within given time.', 'No mobile phones or external help allowed.', 'Team with highest score wins.'] },
-            ].map((event, i) => (
-              <motion.div
-                key={event.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.06 }}
-                className="card p-6"
-                style={{ borderLeft: '4px solid #C40001' }}
-              >
-                <h4 className="text-base font-display font-bold mb-4" style={{ color: '#222222' }}>{event.name}</h4>
-                <ul className="space-y-3">
-                  {event.rules.map((rule, j) => (
-                    <li key={j} className="flex items-start gap-3 text-sm" style={{ color: '#555555' }}>
-                      <CheckCircle size={16} className="mt-0.5 flex-shrink-0" style={{ color: '#C40001' }} />
-                      {rule}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Important Note */}
-          <div className="rounded-2xl p-5 flex items-start gap-3" style={{ backgroundColor: '#fff0f0', border: '1px solid #ffc1c1' }}>
-            <AlertTriangle size={18} className="flex-shrink-0 mt-0.5" style={{ color: '#C40001' }} />
-            <div>
-              <p className="text-sm font-medium" style={{ color: '#C40001' }}>Important Note</p>
-              <p className="text-sm mt-1" style={{ color: '#8a0000' }}>
-                The organizers reserve the right to modify or update any rules. Any changes will be communicated before the event. The decision of the judges and organizers is final and binding.
-              </p>
-            </div>
-          </div>
         </div>
       </section>
-
 
     </div>
   );

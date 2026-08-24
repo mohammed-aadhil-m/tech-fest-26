@@ -31,7 +31,6 @@ import AdminEvents from './pages/admin/AdminEvents';
 function PublicLayout({ children }) {
   return (
     <>
-      <Navbar />
       <main>{children}</main>
       <Footer />
     </>
