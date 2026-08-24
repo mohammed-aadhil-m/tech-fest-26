@@ -29,8 +29,8 @@ const events = [
     tagline: 'Submit your ideas. Share your knowledge. Inspire others! 🚀',
     submissionEmail: 'suyamburaj@gmail.com',
     submissionDeadline: new Date('2026-09-04'),
-    isTeamEvent: false,
-    maxTeamSize: 1,
+    isTeamEvent: true,
+    maxTeamSize: 3,
     minTeamSize: 1,
     registrationOpen: true,
     active: true
