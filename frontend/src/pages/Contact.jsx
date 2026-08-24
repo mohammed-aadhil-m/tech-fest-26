@@ -13,7 +13,7 @@ const coordinators = [
     phone: '+91 6382323566',
   },
   {
-    name: 'Ms.Arokiya Varsha M',
+    name: 'Ms.Arockia Varsha M',
   },
   {
     name: 'Ms.Tharani M',
