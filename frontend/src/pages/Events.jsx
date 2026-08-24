@@ -4,6 +4,7 @@ import api from '../services/api';
 import EventCard from '../components/EventCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { Zap, Sparkles } from 'lucide-react';
+import ThreeBackground from '../components/ThreeBackground';
 
 export default function Events() {
   const [events, setEvents] = useState([]);
@@ -31,12 +32,13 @@ export default function Events() {
   const nonTechnical = events.filter(e => e.category === 'non-technical' || e.category === 'coming-soon');
 
   return (
-    <div className="min-h-screen bg-[#050505] selection:bg-red-500/30 selection:text-white">
-      {/* Hero */}
-      <div className="relative border-b border-white/5 py-24 overflow-hidden">
-        <div className="absolute inset-0 bg-[#0a0a0c]"></div>
-        <div className="absolute inset-0 circuit-bg opacity-30"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-red-500/10 blur-[100px] rounded-full"></div>
+    <div className="min-h-screen bg-[#050505] selection:bg-red-500/30 selection:text-white relative overflow-hidden">
+      <ThreeBackground />
+      
+      {/* Page Content */}
+      <div className="relative z-10">
+        {/* Hero */}
+        <div className="relative border-b border-white/5 py-24">
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
@@ -84,8 +86,8 @@ export default function Events() {
             <div className="absolute inset-0 grid-bg opacity-10 pointer-events-none"></div>
             
             {/* Technical Events */}
-            {(activeTab === 'all' || activeTab === 'technical') && technical.length > 0 && (
-              <div className="mb-24 relative z-10">
+            {technical.length > 0 && (
+              <div className={`mb-24 relative z-10 transition-opacity duration-500 ${activeTab !== 'all' && activeTab !== 'technical' ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-12">
                   <div className="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center glow-red flex-shrink-0">
                     <Zap size={24} className="text-red-500" />
@@ -102,8 +104,8 @@ export default function Events() {
             )}
 
             {/* Non-Technical Events */}
-            {(activeTab === 'all' || activeTab === 'non-technical') && nonTechnical.length > 0 && (
-              <div className="relative z-10">
+            {nonTechnical.length > 0 && (
+              <div className={`relative z-10 transition-opacity duration-500 ${activeTab !== 'all' && activeTab !== 'non-technical' ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-12">
                   <div className="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center glow-red flex-shrink-0">
                     <Sparkles size={24} className="text-red-500" />
@@ -119,7 +121,7 @@ export default function Events() {
               </div>
             )}
 
-            {filtered.length === 0 && (
+            {events.length === 0 && (
               <div className="text-center py-32 relative z-10">
                 <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/5 border border-white/10 mb-6 text-gray-600">
                   <Zap size={32} />
@@ -129,6 +131,7 @@ export default function Events() {
             )}
           </div>
         )}
+      </div>
       </div>
     </div>
   );

@@ -4,20 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, Zap, Code2, Trophy, Users, CheckCircle, AlertTriangle, Calendar, Clock, MapPin } from 'lucide-react';
 import api from '../services/api';
 
-// Immersive Dark Hero Background
-function HeroBackground() {
-  return (
-    <div className="absolute inset-0 z-0 overflow-hidden">
-      <div className="absolute inset-0 bg-[#050505]"></div>
-      {/* Orbital glow effects */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-red-500/20 blur-[120px] animate-pulse"></div>
-      <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-red-900/30 blur-[150px]"></div>
-      <div className="absolute inset-0 grid-bg opacity-30" />
-      {/* Vignette */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050505]/50 to-[#050505]"></div>
-    </div>
-  );
-}
+import ThreeBackground from '../components/ThreeBackground';
 
 // Countdown component
 function Countdown({ targetDate, label }) {
@@ -125,7 +112,7 @@ export default function Home() {
 
       {/* ── HERO ───────────────────────────────────────── */}
       <section id="home" className="relative min-h-screen flex items-center pt-24 pb-12 overflow-hidden">
-        <HeroBackground />
+        <ThreeBackground />
 
           <div className="flex flex-col items-center justify-center text-center max-w-4xl mx-auto">
             <motion.div
@@ -219,7 +206,7 @@ export default function Home() {
 
               <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
                 <Link to="/register" className="btn-primary w-full sm:w-auto justify-center text-lg px-8 py-4 shadow-[0_0_20px_rgba(255,42,42,0.3)]">
-                  Initialize Registration
+                  Registration
                 </Link>
                 <Link to="/events" className="btn-secondary w-full sm:w-auto justify-center px-8 py-4">
                   Explore Events <ChevronRight size={18} />

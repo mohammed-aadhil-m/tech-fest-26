@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Upload, X, CreditCard, Phone, Hash, CheckCircle, Home } from 'lucide-react';
+import { Upload, X, CreditCard, Phone, Hash, CheckCircle, Home, AlertCircle } from 'lucide-react';
 import api from '../services/api';
 import { useToast } from '../context/ToastContext';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -87,50 +87,62 @@ export default function Payment() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#050505] selection:bg-red-500/30 selection:text-white">
       {/* Header */}
-      <div className="bg-white border-b border-gray-100 py-12 circuit-bg">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <span className="badge badge-technical mb-4">TECH FEST '26</span>
-            <h1 className="text-4xl font-display font-black text-gray-900 mb-2">
-              Complete <span className="text-gradient-red">Payment</span>
+      <div className="relative border-b border-white/5 py-20 overflow-hidden">
+        <div className="absolute inset-0 bg-[#0a0a0c]"></div>
+        <div className="absolute inset-0 circuit-bg opacity-30"></div>
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-red-500/10 blur-[120px] rounded-full pointer-events-none"></div>
+        
+        <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+            <span className="badge badge-technical mb-6">TECH FEST '26</span>
+            <h1 className="text-5xl md:text-6xl font-display font-black mb-4 text-white">
+              Transaction <span className="text-gradient-red">Processing</span>
             </h1>
-            <p className="text-gray-500">Scan the QR code and upload your payment screenshot to confirm registration</p>
-            <p className="mt-2 font-mono text-xs text-primary-700 font-medium">
-              Registration ID: {registrationId}
-            </p>
+            <p className="text-gray-400 text-lg font-light">Transfer funds via secure channels to confirm your initialization</p>
+            <div className="mt-6 inline-flex items-center gap-3 px-6 py-2 bg-white/5 border border-white/10 rounded-xl">
+              <Hash size={16} className="text-red-500" />
+              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Auth ID</span>
+              <span className="font-mono font-bold text-red-400 text-sm tracking-wider">{registrationId}</span>
+            </div>
           </motion.div>
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid md:grid-cols-2 gap-6 mb-6">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative">
+        <div className="absolute inset-0 grid-bg opacity-10 pointer-events-none"></div>
+
+        <div className="grid md:grid-cols-2 gap-6 mb-8 relative z-10">
           {/* QR Code Panel */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="card p-6 flex flex-col items-center text-center"
+            className="card bg-black/60 border border-white/10 p-8 backdrop-blur-xl flex flex-col items-center text-center"
           >
-            <CreditCard size={24} className="text-primary-700 mb-3" />
-            <h2 className="text-lg font-display font-bold text-gray-900 mb-4">Scan to Pay</h2>
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-red-500/10 border border-red-500/20 text-red-500 mb-6 glow-red">
+              <CreditCard size={24} />
+            </div>
+            <h2 className="text-2xl font-display font-bold text-white mb-6">Scan to Transfer</h2>
             {QR_CODE_IMAGE ? (
-              <img
-                src={QR_CODE_IMAGE}
-                alt="Payment QR Code"
-                className="w-48 h-48 object-contain border-4 border-primary-100 rounded-2xl p-2 bg-white shadow-md"
-              />
+              <div className="p-3 bg-white rounded-2xl shadow-[0_0_30px_rgba(255,42,42,0.15)] border border-red-500/20">
+                <img
+                  src={QR_CODE_IMAGE}
+                  alt="Payment QR Code"
+                  className="w-48 h-48 object-contain rounded-xl"
+                />
+              </div>
             ) : (
-              <div className="w-48 h-48 rounded-2xl border-2 border-dashed border-primary-200 bg-primary-50 flex flex-col items-center justify-center gap-2">
-                <CreditCard size={36} className="text-primary-300" />
-                <p className="text-xs text-primary-400 font-medium text-center px-3">
-                  QR Code will appear here once configured by admin
+              <div className="w-48 h-48 rounded-2xl border-2 border-dashed border-white/10 bg-white/5 flex flex-col items-center justify-center gap-3 p-4">
+                <CreditCard size={36} className="text-gray-600" />
+                <p className="text-[10px] uppercase tracking-widest text-gray-500 font-bold text-center">
+                  Terminal Offline.<br/>Awaiting Config.
                 </p>
               </div>
             )}
-            <p className="text-xs text-gray-400 mt-4 leading-relaxed">
-              Scan the QR code with any UPI app (GPay, PhonePe, Paytm, etc.) to make payment.
+            <p className="text-sm text-gray-400 mt-6 leading-relaxed font-light">
+              Use any UPI gateway (GPay, PhonePe, Paytm, etc.) to securely transfer the <strong className="text-white">₹250</strong> processing fee.
             </p>
           </motion.div>
 
@@ -139,26 +151,31 @@ export default function Payment() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="card p-6"
+            className="card bg-black/60 border border-white/10 p-8 backdrop-blur-xl"
           >
-            <h2 className="text-lg font-display font-bold text-gray-900 mb-4">Payment Steps</h2>
-            <ol className="space-y-3">
+            <h2 className="text-2xl font-display font-bold text-white mb-6">Transfer Protocols</h2>
+            <ol className="space-y-4">
               {[
-                'Scan the QR code using your UPI payment app',
-                'Enter the registration fee amount',
-                'Complete the payment successfully',
-                'Take a screenshot of the payment confirmation',
-                'Fill in the transaction details below',
-                'Upload the screenshot and submit',
+                'Scan the datalink (QR) using your UPI application',
+                'Authorize the exact fee transfer (₹250 per operative)',
+                'Complete the transaction successfully',
+                'Capture visual proof (Screenshot) of confirmation',
+                'Log the transaction reference ID below',
+                'Upload visual proof and submit for verification',
               ].map((step, i) => (
-                <li key={i} className="flex items-start gap-3 text-sm text-gray-600">
-                  <span className="w-5 h-5 rounded-full bg-primary-700 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
-                    {i + 1}
+                <li key={i} className="flex items-start gap-4 text-sm text-gray-400">
+                  <span className="w-6 h-6 rounded-lg bg-red-500/10 border border-red-500/30 text-red-500 text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5 glow-red">
+                    0{i + 1}
                   </span>
-                  {step}
+                  <span className="leading-relaxed">{step}</span>
                 </li>
               ))}
             </ol>
+            
+            <div className="mt-8 rounded-xl p-4 bg-red-500/5 border border-red-500/20 flex gap-3 items-start">
+              <AlertCircle size={16} className="text-red-500 flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-gray-400">Your Auth ID will remain unverified until the transfer is manually confirmed by system admins.</p>
+            </div>
           </motion.div>
         </div>
 
@@ -168,82 +185,91 @@ export default function Payment() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           onSubmit={handleSubmit}
-          className="card p-6 space-y-5"
+          className="card bg-black/60 border border-white/10 p-8 backdrop-blur-xl relative z-10"
           noValidate
         >
-          <h2 className="text-xl font-display font-bold text-gray-900 flex items-center gap-2">
-            <CheckCircle size={20} className="text-primary-700" />
-            Payment Confirmation Details
+          <h2 className="text-2xl font-display font-bold text-white mb-8 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center glow-red text-red-500">
+              <CheckCircle size={20} />
+            </div>
+            Transfer Confirmation Log
           </h2>
 
-          {/* Transaction ID */}
-          <div>
-            <label className="form-label flex items-center gap-1.5">
-              <Hash size={14} className="text-primary-700" />
-              Transaction ID *
-            </label>
-            <input
-              type="text"
-              id="transactionId"
-              className={`form-input ${errors.transactionId ? 'border-red-400' : ''}`}
-              placeholder="Enter UPI transaction ID or reference number"
-              value={form.transactionId}
-              onChange={e => handleChange('transactionId', e.target.value)}
-            />
-            {errors.transactionId && <p className="form-error">{errors.transactionId}</p>}
-          </div>
+          <div className="grid sm:grid-cols-2 gap-6 mb-6">
+            {/* Transaction ID */}
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                <Hash size={14} className="text-red-500" />
+                Transaction Ref ID *
+              </label>
+              <input
+                type="text"
+                id="transactionId"
+                className={`w-full bg-white/5 border ${errors.transactionId ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-white/20'} rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all`}
+                placeholder="e.g. 123456789012"
+                value={form.transactionId}
+                onChange={e => handleChange('transactionId', e.target.value)}
+              />
+              {errors.transactionId && <p className="text-xs text-red-500 mt-2 font-medium">{errors.transactionId}</p>}
+            </div>
 
-          {/* Payment Phone */}
-          <div>
-            <label className="form-label flex items-center gap-1.5">
-              <Phone size={14} className="text-primary-700" />
-              Phone Number Used for Payment *
-            </label>
-            <input
-              type="tel"
-              id="paymentPhone"
-              className={`form-input ${errors.paymentPhone ? 'border-red-400' : ''}`}
-              placeholder="10-digit mobile number used for UPI payment"
-              value={form.paymentPhone}
-              onChange={e => handleChange('paymentPhone', e.target.value)}
-              maxLength={10}
-            />
-            {errors.paymentPhone && <p className="form-error">{errors.paymentPhone}</p>}
+            {/* Payment Phone */}
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                <Phone size={14} className="text-red-500" />
+                Comlink ID Used (Mobile) *
+              </label>
+              <input
+                type="tel"
+                id="paymentPhone"
+                className={`w-full bg-white/5 border ${errors.paymentPhone ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-white/20'} rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all`}
+                placeholder="10-digit number"
+                value={form.paymentPhone}
+                onChange={e => handleChange('paymentPhone', e.target.value)}
+                maxLength={10}
+              />
+              {errors.paymentPhone && <p className="text-xs text-red-500 mt-2 font-medium">{errors.paymentPhone}</p>}
+            </div>
           </div>
 
           {/* Screenshot Upload */}
-          <div>
-            <label className="form-label flex items-center gap-1.5">
-              <Upload size={14} className="text-primary-700" />
-              Upload Payment Screenshot *
+          <div className="mb-8">
+            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+              <Upload size={14} className="text-red-500" />
+              Upload Visual Proof (Screenshot) *
             </label>
             {!screenshotPreview ? (
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all hover:border-primary-400 hover:bg-primary-50 ${
-                  errors.screenshot ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50'
+                className={`border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all ${
+                  errors.screenshot 
+                    ? 'border-red-500/50 bg-red-500/5 hover:bg-red-500/10' 
+                    : 'border-white/10 bg-white/5 hover:border-white/30 hover:bg-white/10'
                 }`}
               >
-                <Upload size={32} className="mx-auto mb-2 text-gray-300" />
-                <p className="text-sm font-medium text-gray-500 mb-1">Click to upload screenshot</p>
-                <p className="text-xs text-gray-400">JPG, PNG, WEBP up to 5MB</p>
+                <Upload size={32} className={`mx-auto mb-3 ${errors.screenshot ? 'text-red-500' : 'text-gray-500'}`} />
+                <p className="text-sm font-bold text-white mb-1 uppercase tracking-wider">Select Image File</p>
+                <p className="text-xs text-gray-500 uppercase tracking-widest font-bold">JPG, PNG, WEBP (Max 5MB)</p>
               </div>
             ) : (
-              <div className="relative rounded-xl overflow-hidden border border-gray-200">
+              <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-black/50">
                 <img
                   src={screenshotPreview}
                   alt="Payment screenshot preview"
-                  className="w-full max-h-64 object-contain bg-gray-50"
+                  className="w-full max-h-64 object-contain"
                 />
                 <button
                   type="button"
                   onClick={removeScreenshot}
-                  className="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-md"
+                  className="absolute top-4 right-4 w-10 h-10 bg-red-500/20 text-red-500 border border-red-500/50 rounded-xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all backdrop-blur-md"
                 >
-                  <X size={14} />
+                  <X size={16} />
                 </button>
-                <div className="border-t px-4 py-2" style={{ backgroundColor: '#fff0f0', borderColor: '#ffc1c1' }}>
-                  <p className="text-xs font-medium" style={{ color: '#C40001' }}>Screenshot uploaded successfully</p>
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4">
+                  <div className="flex items-center gap-2 text-green-500">
+                    <CheckCircle size={16} />
+                    <span className="text-xs font-bold uppercase tracking-widest">Image Loaded</span>
+                  </div>
                 </div>
               </div>
             )}
@@ -254,35 +280,37 @@ export default function Payment() {
               className="hidden"
               onChange={handleFileChange}
             />
-            {errors.screenshot && <p className="form-error">{errors.screenshot}</p>}
+            {errors.screenshot && <p className="text-xs text-red-500 mt-2 font-medium">{errors.screenshot}</p>}
           </div>
 
           {/* Submit */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-white/5">
             <button
               type="submit"
               id="submit-payment"
               disabled={loading}
-              className="btn-primary flex-1 justify-center py-3 text-base shadow-red-md disabled:opacity-50"
+              className="relative group overflow-hidden rounded-2xl p-[1px] flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? (
-                <>
-                  <LoadingSpinner size="sm" />
-                  Submitting Payment...
-                </>
-              ) : (
-                'Submit Payment Details'
-              )}
+              <span className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 opacity-70 group-hover:opacity-100 transition-opacity duration-300"></span>
+              <div className="relative bg-black px-8 py-5 rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 group-hover:bg-black/40">
+                {loading ? (
+                  <>
+                    <LoadingSpinner size="sm" />
+                    <span className="text-white font-bold tracking-wider uppercase">Processing...</span>
+                  </>
+                ) : (
+                  <span className="text-white font-bold tracking-wider uppercase text-lg">Transmit Log</span>
+                )}
+              </div>
             </button>
-            <Link to="/" className="btn-secondary flex-1 justify-center py-3 text-base">
-              <Home size={18} />
-              Back to Home
+            <Link to="/" className="relative group overflow-hidden rounded-2xl p-[1px] sm:w-1/3">
+              <span className="absolute inset-0 bg-white/20 transition-opacity duration-300 group-hover:bg-white/40"></span>
+              <div className="relative bg-[#111] px-6 py-5 rounded-2xl flex items-center justify-center gap-2 transition-all duration-300">
+                <Home size={18} className="text-white" />
+                <span className="text-white font-bold tracking-wider uppercase text-sm">Abort</span>
+              </div>
             </Link>
           </div>
-
-          <p className="text-xs text-gray-400 text-center">
-            Your registration will be confirmed once payment is verified by our team.
-          </p>
         </motion.form>
       </div>
     </div>

@@ -5,24 +5,18 @@ import api from '../services/api';
 
 const coordinators = [
   {
-    name: 'Coordinator Name 1',
-    phone: '+91 98765 43210',
-    email: 'coordinator1@vvcoe.edu.in',
+    name: 'Mr.Kirubakaran J',
+    phone: '+91 9344170263',
   },
   {
-    name: 'Coordinator Name 2',
-    phone: '+91 98765 43211',
-    email: 'coordinator2@vvcoe.edu.in',
+    name: 'Mr.Ranjith Kumar R',
+    phone: '+91 6382323566',
   },
   {
-    name: 'Coordinator Name 3',
-    phone: '+91 98765 43212',
-    email: 'coordinator3@vvcoe.edu.in',
+    name: 'Ms.Arokiya Varsha M',
   },
   {
-    name: 'Coordinator Name 4',
-    phone: '+91 98765 43213',
-    email: 'coordinator4@vvcoe.edu.in',
+    name: 'Ms.Tharani M',
   },
 ];
 
@@ -43,10 +37,10 @@ export default function Contact() {
         <div className="absolute inset-0 bg-[#0a0a0c]"></div>
         <div className="absolute inset-0 circuit-bg opacity-30"></div>
         <div className="absolute top-0 right-1/4 w-96 h-96 bg-red-500/10 blur-[120px] rounded-full pointer-events-none"></div>
-        
+
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-            <span className="badge badge-technical mb-6">Comm Link</span>
+            <span className="badge badge-technical mb-6">TECH FEST '26</span>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-display font-black mb-6 text-white">
               Contact <span className="text-gradient-red">Us</span>
             </h1>
@@ -57,7 +51,7 @@ export default function Contact() {
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative">
         <div className="absolute inset-0 grid-bg opacity-10 pointer-events-none"></div>
-        
+
         <div className="grid md:grid-cols-2 gap-8 relative z-10">
           {/* Left Column */}
           <motion.div
@@ -69,7 +63,7 @@ export default function Contact() {
             {/* College Info */}
             <div className="card bg-black/60 border border-white/10 hover:border-red-500/30 transition-colors p-8 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-full blur-3xl"></div>
-              
+
               <div className="flex items-center gap-4 mb-6 relative z-10">
                 <div className="w-14 h-14 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center justify-center glow-red">
                   <span className="text-red-500 font-display font-black text-xl">VV</span>
@@ -223,31 +217,35 @@ export default function Contact() {
                 {coordinators.map((c, i) => (
                   <div key={i} className="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/5 hover:border-white/20 transition-colors">
                     <div className="w-12 h-12 rounded-full flex items-center justify-center bg-red-500/10 border border-red-500/20 flex-shrink-0 glow-red">
-                      <span className="font-black text-lg text-red-500">{c.name.charAt(0)}</span>
+                      <span className="font-black text-lg text-red-500">{c.name ? c.name.replace('Mr.', '').replace('Ms.', '').trim().charAt(0) : 'C'}</span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold text-white truncate mb-1">{c.name}</p>
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                        <a
-                          href={`tel:${c.phone.replace(/\s/g, '')}`}
-                          className="text-xs flex items-center gap-1.5 text-gray-400 hover:text-red-400 transition-colors"
-                        >
-                          <Phone size={12} />
-                          {c.phone}
-                        </a>
-                        <a
-                          href={`mailto:${c.email}`}
-                          className="text-xs flex items-center gap-1.5 text-gray-400 hover:text-red-400 transition-colors truncate"
-                        >
-                          <Mail size={12} className="flex-shrink-0" />
-                          <span className="truncate">{c.email}</span>
-                        </a>
+                        {c.phone && (
+                          <a
+                            href={`tel:${c.phone.replace(/\s/g, '')}`}
+                            className="text-xs flex items-center gap-1.5 text-gray-400 hover:text-red-400 transition-colors"
+                          >
+                            <Phone size={12} />
+                            {c.phone}
+                          </a>
+                        )}
+                        {c.email && (
+                          <a
+                            href={`mailto:${c.email}`}
+                            className="text-xs flex items-center gap-1.5 text-gray-400 hover:text-red-400 transition-colors truncate"
+                          >
+                            <Mail size={12} className="flex-shrink-0" />
+                            <span className="truncate">{c.email}</span>
+                          </a>
+                        )}
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
-            </div>          
+            </div>
           </motion.div>
         </div>
       </div>

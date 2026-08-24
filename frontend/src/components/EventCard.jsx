@@ -1,5 +1,6 @@
+import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 
 const categoryStyles = {
@@ -39,24 +40,71 @@ export default function EventCard({ event, index = 0 }) {
   const isComingSoon = event.category === 'coming-soon';
   const style = categoryStyles[event.category] || categoryStyles.technical;
   const description = customDescriptions[event.slug] || event.description;
+  
+  const ref = useRef(null);
+
+  // Motion values for the 3D tilt effect
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  // Smooth springs for a fluid, floating feel
+  const springConfig = { damping: 20, stiffness: 150, mass: 0.5 };
+  const springX = useSpring(x, springConfig);
+  const springY = useSpring(y, springConfig);
+
+  // Map mouse position to rotation degrees
+  const rotateX = useTransform(springY, [-0.5, 0.5], ['15deg', '-15deg']);
+  const rotateY = useTransform(springX, [-0.5, 0.5], ['-15deg', '15deg']);
+
+  // Handle mouse movement over the card
+  const handleMouseMove = (e) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    // Convert to normalized coordinates (-0.5 to 0.5)
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
 
   return (
     <motion.div
+      ref={ref}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-50px' }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="group relative h-full"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateX,
+        rotateY,
+        transformStyle: 'preserve-3d',
+        perspective: 1000
+      }}
+      className="group relative h-full w-full"
     >
       <div 
         className="absolute -inset-0.5 rounded-2xl blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" 
-        style={{ backgroundColor: style.glow, zIndex: -1 }}
+        style={{ backgroundColor: style.glow, zIndex: -1, transform: 'translateZ(-20px)' }}
       ></div>
 
       <Link
         to={`/events/${event.slug}`}
         className="card-hover h-full flex flex-col overflow-hidden bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl block relative z-10"
-        style={isComingSoon ? { cursor: 'default', opacity: 0.7 } : {}}
+        style={isComingSoon ? { cursor: 'default', opacity: 0.7 } : { transformStyle: 'preserve-3d' }}
         onClick={(e) => {
           if (isComingSoon) {
             e.preventDefault();
@@ -64,7 +112,7 @@ export default function EventCard({ event, index = 0 }) {
         }}
       >
         {/* Banner Image */}
-        <div className="w-full h-48 sm:h-56 bg-[#0a0a0c] relative overflow-hidden flex-shrink-0 border-b border-white/10">
+        <div className="w-full h-48 sm:h-56 bg-[#0a0a0c] relative overflow-hidden flex-shrink-0 border-b border-white/10" style={{ transform: 'translateZ(10px)' }}>
           <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10 opacity-60"></div>
           
           <img
@@ -85,7 +133,7 @@ export default function EventCard({ event, index = 0 }) {
             <span style={{ color: style.badge.color }}>{event.icon}</span>
           </div>
 
-          <div className="absolute bottom-4 left-4 z-20">
+          <div className="absolute bottom-4 left-4 z-20" style={{ transform: 'translateZ(30px)' }}>
             <span
               className="inline-flex items-center gap-1 px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-md"
               style={{
@@ -100,7 +148,7 @@ export default function EventCard({ event, index = 0 }) {
         </div>
 
         {/* Header Info */}
-        <div className="p-6 flex-1 flex flex-col items-start justify-start text-left bg-gradient-to-b from-white/5 to-transparent">
+        <div className="p-6 flex-1 flex flex-col items-start justify-start text-left bg-gradient-to-b from-white/5 to-transparent" style={{ transform: 'translateZ(20px)' }}>
           <h3 className="text-xl font-display font-bold text-white mb-3 group-hover:text-red-400 transition-colors">
             {event.name}
           </h3>

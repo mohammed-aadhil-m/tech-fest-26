@@ -26,16 +26,16 @@ export default function AdminSidebar({ collapsed, onToggle }) {
   };
 
   return (
-    <div className={`flex flex-col h-full bg-gray-900 transition-all duration-300 ${collapsed ? 'w-16' : 'w-64'}`}>
+    <div className={`flex flex-col h-full bg-black/60 backdrop-blur-xl border-r border-white/10 transition-all duration-300 ${collapsed ? 'w-16' : 'w-64'}`}>
       {/* Logo */}
-      <div className="flex items-center gap-3 px-4 py-5 border-b border-gray-800">
-        <div className="w-9 h-9 bg-red-gradient rounded-lg flex items-center justify-center flex-shrink-0">
-          <span className="text-white font-bold text-xs">TF</span>
+      <div className="flex items-center gap-3 px-4 py-5 border-b border-white/10">
+        <div className="w-9 h-9 bg-red-500/20 border border-red-500/50 rounded-lg flex items-center justify-center flex-shrink-0 glow-red">
+          <span className="text-red-500 font-bold text-xs">TF</span>
         </div>
         {!collapsed && (
           <div className="overflow-hidden">
-            <p className="text-white font-display font-bold text-sm leading-tight">TECH FEST '26</p>
-            <p className="text-gray-400 text-xs">Admin Panel</p>
+            <p className="text-white font-display font-bold text-sm leading-tight uppercase tracking-wider">TECH FEST '26</p>
+            <p className="text-red-400 text-[10px] uppercase font-bold tracking-widest">Admin Terminal</p>
           </div>
         )}
       </div>
@@ -43,7 +43,7 @@ export default function AdminSidebar({ collapsed, onToggle }) {
       {/* Toggle */}
       <button
         onClick={onToggle}
-        className="absolute top-4 right-[-12px] w-6 h-6 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-full flex items-center justify-center shadow-md transition-all"
+        className="absolute top-4 right-[-12px] w-6 h-6 bg-red-900 border border-red-500 hover:bg-red-500 text-white rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(255,42,42,0.5)] transition-all z-50"
       >
         {collapsed ? <ChevronRight size={12} /> : <X size={12} />}
       </button>
@@ -55,17 +55,17 @@ export default function AdminSidebar({ collapsed, onToggle }) {
             key={item.to}
             to={item.to}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 text-sm font-medium transition-all duration-150 mx-2 rounded-xl mb-1 group relative ${
+              `flex items-center gap-3 px-4 py-3 text-sm font-medium transition-all duration-300 mx-2 rounded-xl mb-1 group relative border ${
                 isActive
-                  ? 'bg-primary-700 text-white shadow-red-sm'
-                  : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                  ? 'bg-red-500/20 text-red-500 border-red-500/50 glow-red'
+                  : 'text-gray-400 border-transparent hover:bg-white/5 hover:text-white hover:border-white/10'
               }`
             }
           >
             <item.icon size={18} className="flex-shrink-0" />
-            {!collapsed && <span className="truncate">{item.label}</span>}
+            {!collapsed && <span className="truncate uppercase tracking-wider text-xs">{item.label}</span>}
             {collapsed && (
-              <div className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 transition-opacity">
+              <div className="absolute left-full ml-2 px-3 py-1.5 bg-black border border-red-500/30 text-red-500 text-[10px] font-bold uppercase tracking-widest rounded-lg shadow-[0_0_15px_rgba(255,42,42,0.3)] opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 transition-opacity">
                 {item.label}
               </div>
             )}
@@ -74,24 +74,24 @@ export default function AdminSidebar({ collapsed, onToggle }) {
       </nav>
 
       {/* User & Logout */}
-      <div className="border-t border-gray-800 p-4">
+      <div className="border-t border-white/10 p-4 bg-black/40">
         {!collapsed && admin && (
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-full bg-primary-700 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 rounded-lg bg-red-500/20 border border-red-500/50 flex items-center justify-center text-red-500 text-xs font-bold flex-shrink-0 glow-red">
               {admin.username?.[0]?.toUpperCase()}
             </div>
             <div className="overflow-hidden">
-              <p className="text-white text-xs font-medium truncate">{admin.username}</p>
-              <p className="text-gray-400 text-xs capitalize">{admin.role}</p>
+              <p className="text-white text-xs font-bold uppercase tracking-wide truncate">{admin.username}</p>
+              <p className="text-gray-500 text-[10px] uppercase tracking-widest">{admin.role}</p>
             </div>
           </div>
         )}
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 text-gray-400 hover:text-red-400 transition-colors text-sm w-full px-2 py-2 rounded-lg hover:bg-gray-800"
+          className="flex items-center justify-center gap-2 text-gray-400 hover:text-red-500 hover:bg-red-500/10 border border-transparent hover:border-red-500/30 transition-all duration-300 text-xs font-bold uppercase tracking-wider w-full px-2 py-2.5 rounded-xl"
         >
           <LogOut size={16} className="flex-shrink-0" />
-          {!collapsed && 'Logout'}
+          {!collapsed && 'Terminate Session'}
         </button>
       </div>
     </div>

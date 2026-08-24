@@ -7,7 +7,6 @@ import { useToast } from '../context/ToastContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const years = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
-const emptyParticipant = { name: '', email: '', mobile: '', college: '' };
 
 const EVENT_MAPPING = {
   'paper-presentation': 'E1',
@@ -46,7 +45,7 @@ export default function Register() {
 
   const [form, setForm] = useState({
     fullName: '', email: '', mobile: '',
-    college: 'V V College of Engineering', department: '', year: '', foodPreference: '',
+    college: '', department: '', year: '', foodPreference: '',
   });
   const [errors, setErrors] = useState({});
 
@@ -69,11 +68,11 @@ export default function Register() {
         toast.error(`You can select a maximum of ${MAX_EVENTS} events.`);
         return prev;
       }
-      
+
       const evId = EVENT_MAPPING[slug];
       const selectedIds = prev.map(s => EVENT_MAPPING[s]).filter(Boolean);
       const isCompatible = selectedIds.every(id => COMPATIBILITY_MATRIX[id]?.includes(evId));
-      
+
       if (!isCompatible) {
         toast.error('This event is not compatible with your currently selected events.');
         return prev;
@@ -89,7 +88,7 @@ export default function Register() {
     if (errors[field]) setErrors(e => ({ ...e, [field]: '' }));
   };
 
-  const getTeam = (slug) => teamDetails[slug] || { teamName: '', teamLeader: '', teamMembers: [{ ...emptyParticipant }] };
+  const getTeam = (slug) => teamDetails[slug] || { action: 'create', teamName: '', teamCode: '', verifiedTeam: null, verificationError: '', isVerifying: false };
 
   const setTeam = (slug, update) => {
     setTeamDetails(prev => ({
@@ -98,25 +97,19 @@ export default function Register() {
     }));
   };
 
-  const addMember = (slug, maxSize) => {
-    const team = getTeam(slug);
-    if (team.teamMembers.length < maxSize - 1) {
-      setTeam(slug, { teamMembers: [...team.teamMembers, { ...emptyParticipant }] });
+  const handleVerifyTeamCode = async (slug, teamCode) => {
+    if (!teamCode) {
+      setTeam(slug, { verificationError: 'Please enter a team code.', verifiedTeam: null });
+      return;
     }
-  };
-
-  const removeMember = (slug, index) => {
-    const team = getTeam(slug);
-    if (team.teamMembers.length > 1) {
-      setTeam(slug, { teamMembers: team.teamMembers.filter((_, i) => i !== index) });
+    setTeam(slug, { isVerifying: true, verificationError: '', verifiedTeam: null });
+    try {
+      const res = await api.get(`/teams/verify/${teamCode}?eventSlug=${slug}`);
+      setTeam(slug, { verifiedTeam: res.data.data, isVerifying: false });
+      toast.success('Team verified successfully!');
+    } catch (err) {
+      setTeam(slug, { verificationError: err.response?.data?.message || 'Invalid team code.', isVerifying: false });
     }
-  };
-
-  const handleMemberChange = (slug, index, field, value) => {
-    const team = getTeam(slug);
-    const members = [...team.teamMembers];
-    members[index] = { ...members[index], [field]: value };
-    setTeam(slug, { teamMembers: members });
   };
 
   const validate = () => {
@@ -154,9 +147,12 @@ export default function Register() {
         const team = getTeam(slug);
         const entry = { eventSlug: slug };
         if (ev?.isTeamEvent) {
-          entry.teamName = team.teamName;
-          entry.teamLeader = team.teamLeader;
-          entry.teamMembers = team.teamMembers;
+          entry.action = team.action;
+          if (team.action === 'create') {
+            entry.teamName = team.teamName;
+          } else {
+            entry.teamCode = team.teamCode;
+          }
         }
         return entry;
       });
@@ -165,7 +161,7 @@ export default function Register() {
         ...form,
         selectedEvents: selectedEventsPayload,
       });
-      navigate(`/payment/${res.data.data.registrationId}`);
+      navigate(`/payment/${res.data.registrationId}`);
     } catch (err) {
       const msg = err.response?.data?.message || 'Registration failed. Please try again.';
       toast.error(msg);
@@ -187,20 +183,20 @@ export default function Register() {
         <div className="absolute inset-0 bg-[#0a0a0c]"></div>
         <div className="absolute inset-0 circuit-bg opacity-30"></div>
         <div className="absolute top-0 right-1/4 w-96 h-96 bg-red-500/10 blur-[120px] rounded-full pointer-events-none"></div>
-        
+
         <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <span className="badge badge-technical mb-6">TECH FEST '26</span>
             <h1 className="text-5xl md:text-6xl font-display font-black mb-4 text-white">
-              Event <span className="text-gradient-red">Initialization</span>
+              Event <span className="text-gradient-red">REGISTRATION</span>
             </h1>
             <p className="text-gray-400 text-lg font-light">Select up to {MAX_EVENTS} protocols and encrypt your data</p>
             <div className="mt-8 flex justify-center">
-              <span className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-red-500/10 border border-red-500/30 glow-red">
+              <span className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-red-500/20 border border-red-500/50 glow-red shadow-[0_0_20px_rgba(255,42,42,0.3)]">
                 <Sparkles size={20} className="text-red-500" />
                 <span className="text-white font-medium tracking-wide">Processing Fee:</span>
-                <strong className="text-2xl text-red-500 font-display font-black tracking-widest">₹250</strong>
-                <span className="text-xs text-red-400 uppercase tracking-widest">/ Node</span>
+                <strong className="text-2xl text-white font-display font-black tracking-widest bg-red-600 px-3 py-1 rounded-lg shadow-[0_0_15px_rgba(255,42,42,0.6)]">₹250</strong>
+                <span className="text-xs text-red-300 font-bold uppercase tracking-widest bg-red-900/40 px-2 py-1 rounded-md">/ Per Head</span>
               </span>
             </div>
           </motion.div>
@@ -228,42 +224,42 @@ export default function Register() {
             </h2>
             <div className="grid sm:grid-cols-2 gap-6">
               <div className="sm:col-span-2">
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Designation (Full Name) *</label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Full Name *</label>
                 <input type="text" id="fullName" className={`w-full bg-white/5 border ${errors.fullName ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-white/20'} rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all`}
                   placeholder="Enter your full name" value={form.fullName}
                   onChange={e => handleChange('fullName', e.target.value)} />
                 {errors.fullName && <p className="text-xs text-red-500 mt-2 font-medium">{errors.fullName}</p>}
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Comm Link (Email) *</label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Email Address *</label>
                 <input type="email" id="email" className={`w-full bg-white/5 border ${errors.email ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-white/20'} rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all`}
                   placeholder="operative@network.com" value={form.email}
                   onChange={e => handleChange('email', e.target.value)} />
                 {errors.email && <p className="text-xs text-red-500 mt-2 font-medium">{errors.email}</p>}
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Comlink ID (Mobile) *</label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Mobile Number *</label>
                 <input type="tel" id="mobile" className={`w-full bg-white/5 border ${errors.mobile ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-white/20'} rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all`}
                   placeholder="10-digit sequence" value={form.mobile}
                   onChange={e => handleChange('mobile', e.target.value)} />
                 {errors.mobile && <p className="text-xs text-red-500 mt-2 font-medium">{errors.mobile}</p>}
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Base of Operations (College) *</label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">College *</label>
                 <input type="text" id="college" className={`w-full bg-white/5 border ${errors.college ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-white/20'} rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all`}
                   placeholder="Academy Name" value={form.college}
                   onChange={e => handleChange('college', e.target.value)} />
                 {errors.college && <p className="text-xs text-red-500 mt-2 font-medium">{errors.college}</p>}
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Division (Department) *</label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Department *</label>
                 <input type="text" id="department" className={`w-full bg-white/5 border ${errors.department ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-white/20'} rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all`}
                   placeholder="e.g. Computer Science" value={form.department}
                   onChange={e => handleChange('department', e.target.value)} />
                 {errors.department && <p className="text-xs text-red-500 mt-2 font-medium">{errors.department}</p>}
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Experience Level (Year) *</label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Year *</label>
                 <select id="year" className={`w-full bg-white/5 border ${errors.year ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-white/20'} rounded-xl px-4 py-3 text-white focus:outline-none focus:bg-[#111] transition-all appearance-none`}
                   value={form.year} onChange={e => handleChange('year', e.target.value)}>
                   <option value="" className="bg-black text-gray-500">Select parameter</option>
@@ -272,7 +268,7 @@ export default function Register() {
                 {errors.year && <p className="text-xs text-red-500 mt-2 font-medium">{errors.year}</p>}
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Fuel Type (Diet) *</label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Food Preference *</label>
                 <select id="foodPreference" className={`w-full bg-white/5 border ${errors.foodPreference ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-white/20'} rounded-xl px-4 py-3 text-white focus:outline-none focus:bg-[#111] transition-all appearance-none`}
                   value={form.foodPreference} onChange={e => handleChange('foodPreference', e.target.value)}>
                   <option value="" className="bg-black text-gray-500">Select parameter</option>
@@ -335,7 +331,7 @@ export default function Register() {
                             className="p-5 rounded-2xl border text-left transition-all duration-300 relative bg-red-500/10 border-red-500/50 shadow-[0_0_15px_rgba(255,42,42,0.15)] overflow-hidden group"
                           >
                             <div className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500/5 to-red-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-                            
+
                             <div className="flex items-center gap-4 relative z-10">
                               <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-black/50 border border-red-500/30">
                                 <span className="text-2xl font-display text-red-500">{ev.icon}</span>
@@ -364,34 +360,36 @@ export default function Register() {
                       {selectedEventSlugs.length === 0 ? 'Available Protocols' : 'Remaining Protocols'}
                     </p>
                     <div className="grid sm:grid-cols-2 gap-4">
-                      {events.filter(ev => {
-                        if (selectedEventSlugs.includes(ev.slug)) return false;
-                        const evId = EVENT_MAPPING[ev.slug];
-                        if (!evId) return false;
-                        const selectedIds = selectedEventSlugs.map(s => EVENT_MAPPING[s]).filter(Boolean);
-                        return selectedIds.every(id => COMPATIBILITY_MATRIX[id].includes(evId));
-                      }).map(ev => {
+                      {events.filter(ev => !selectedEventSlugs.includes(ev.slug)).map(ev => {
                         const evId = EVENT_MAPPING[ev.slug];
                         const isTech = TECHNICAL_EVENTS.includes(evId);
+
+                        const selectedIds = selectedEventSlugs.map(s => EVENT_MAPPING[s]).filter(Boolean);
+                        const isConflicting = evId ? !selectedIds.every(id => COMPATIBILITY_MATRIX[id].includes(evId)) : false;
+
                         return (
                           <button
                             key={ev.slug}
                             type="button"
-                            onClick={() => toggleEvent(ev.slug)}
-                            className="p-5 rounded-2xl border text-left transition-all duration-300 relative bg-white/5 border-white/10 hover:border-white/30 hover:bg-white/10 group"
+                            onClick={() => !isConflicting && toggleEvent(ev.slug)}
+                            disabled={isConflicting}
+                            className={`p-5 rounded-2xl border text-left transition-all duration-300 relative bg-white/5 border-white/10 ${isConflicting
+                                ? 'opacity-40 blur-[1px] cursor-not-allowed grayscale'
+                                : 'hover:border-white/30 hover:bg-white/10 group'
+                              }`}
                           >
                             <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-black/50 border border-white/10 group-hover:border-white/30 transition-colors">
-                                <span className="text-2xl font-display grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500">{ev.icon}</span>
+                              <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-black/50 border border-white/10 ${!isConflicting && 'group-hover:border-white/30'} transition-colors`}>
+                                <span className={`text-2xl font-display ${!isConflicting ? 'grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100' : 'grayscale opacity-50'} transition-all duration-500`}>{ev.icon}</span>
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-base font-bold text-gray-300 group-hover:text-white transition-colors mb-1">{ev.name}</p>
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-gray-400 transition-colors">
-                                  {isTech ? 'Technical' : 'Non-Technical'}
+                                <p className={`text-base font-bold ${isConflicting ? 'text-gray-500' : 'text-gray-300 group-hover:text-white'} transition-colors mb-1`}>{ev.name}</p>
+                                <p className={`text-[10px] font-bold uppercase tracking-widest ${isConflicting ? 'text-red-900' : 'text-gray-500 group-hover:text-gray-400'} transition-colors`}>
+                                  {isConflicting ? 'TIME CONFLICT' : (isTech ? 'Technical' : 'Non-Technical')}
                                 </p>
                               </div>
                               <div className="flex-shrink-0">
-                                <Plus size={20} className="text-gray-600 group-hover:text-white transition-colors" />
+                                <Plus size={20} className={`${isConflicting ? 'text-gray-700' : 'text-gray-600 group-hover:text-white'} transition-colors`} />
                               </div>
                             </div>
                           </button>
@@ -416,72 +414,73 @@ export default function Register() {
                 className="card bg-black/60 border border-white/10 p-8 backdrop-blur-xl relative overflow-hidden"
               >
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500 glow-red"></div>
-                
+
                 <h2 className="text-2xl font-display font-bold mb-8 flex items-center gap-3 text-white">
                   <div className="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center glow-red text-red-500">
                     <Users size={20} />
                   </div>
                   Squad Configuration — <span className="text-gray-400 font-light">{ev.name}</span>
                 </h2>
-                
-                <div className="grid sm:grid-cols-2 gap-6 mb-8">
+
+                <div className="flex gap-4 mb-8">
+                  <button
+                    type="button"
+                    onClick={() => setTeam(ev.slug, { action: 'create', verifiedTeam: null, verificationError: '' })}
+                    className={`flex-1 py-3 rounded-xl font-bold uppercase tracking-wider text-sm transition-all border ${team.action === 'create' ? 'bg-red-500/20 text-red-500 border-red-500/50 glow-red' : 'bg-white/5 text-gray-500 border-white/10 hover:bg-white/10'}`}
+                  >
+                    Create New Team
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTeam(ev.slug, { action: 'join', teamCode: '', verifiedTeam: null, verificationError: '' })}
+                    className={`flex-1 py-3 rounded-xl font-bold uppercase tracking-wider text-sm transition-all border ${team.action === 'join' ? 'bg-red-500/20 text-red-500 border-red-500/50 glow-red' : 'bg-white/5 text-gray-500 border-white/10 hover:bg-white/10'}`}
+                  >
+                    Join Existing Team
+                  </button>
+                </div>
+
+                {team.action === 'create' ? (
                   <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Squad Designation *</label>
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Squad Designation (Team Name) *</label>
                     <input type="text" className="w-full bg-white/5 border border-white/10 focus:border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all"
                       placeholder="Enter team name" value={team.teamName}
                       onChange={e => setTeam(ev.slug, { teamName: e.target.value })} />
+                    <p className="text-xs text-gray-500 mt-3 flex items-center gap-2">
+                      <AlertCircle size={14} /> A unique Team Code will be generated after registration for your teammates to join.
+                    </p>
                   </div>
+                ) : (
                   <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Squad Leader</label>
-                    <input type="text" className="w-full bg-white/5 border border-white/10 focus:border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all"
-                      placeholder="Team leader name" value={team.teamLeader}
-                      onChange={e => setTeam(ev.slug, { teamLeader: e.target.value })} />
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 mb-6">
-                  <p className="text-xs font-bold uppercase tracking-wider text-white">
-                    Additional Operatives
-                  </p>
-                  <span className="text-[10px] font-bold px-2 py-1 bg-white/10 rounded-md text-gray-400">
-                    Max {ev.maxTeamSize - 1} Units
-                  </span>
-                </div>
-                
-                <div className="space-y-6">
-                  {team.teamMembers.map((member, i) => (
-                    <div key={i} className="rounded-2xl p-6 bg-black/40 border border-white/5 relative group">
-                      <div className="flex items-center justify-between mb-6">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Unit 0{i + 1}</p>
-                        {team.teamMembers.length > 1 && (
-                          <button type="button" onClick={() => removeMember(ev.slug, i)}
-                            className="p-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all">
-                            <Trash2 size={14} />
-                          </button>
-                        )}
-                      </div>
-                      <div className="grid sm:grid-cols-2 gap-4">
-                        <input type="text" className="w-full bg-white/5 border border-white/10 focus:border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all text-sm" placeholder="Full name"
-                          value={member.name} onChange={e => handleMemberChange(ev.slug, i, 'name', e.target.value)} />
-                        <input type="email" className="w-full bg-white/5 border border-white/10 focus:border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all text-sm" placeholder="Email"
-                          value={member.email} onChange={e => handleMemberChange(ev.slug, i, 'email', e.target.value)} />
-                        <input type="tel" className="w-full bg-white/5 border border-white/10 focus:border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all text-sm" placeholder="Mobile"
-                          value={member.mobile} onChange={e => handleMemberChange(ev.slug, i, 'mobile', e.target.value)} />
-                        <input type="text" className="w-full bg-white/5 border border-white/10 focus:border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all text-sm" placeholder="College"
-                          value={member.college} onChange={e => handleMemberChange(ev.slug, i, 'college', e.target.value)} />
-                      </div>
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Access Code (Team Code) *</label>
+                    <div className="flex gap-3">
+                      <input type="text" className="flex-1 bg-white/5 border border-white/10 focus:border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all uppercase"
+                        placeholder="e.g. CW4821" value={team.teamCode}
+                        onChange={e => setTeam(ev.slug, { teamCode: e.target.value, verifiedTeam: null, verificationError: '' })} />
+                      <button
+                        type="button"
+                        onClick={() => handleVerifyTeamCode(ev.slug, team.teamCode)}
+                        disabled={team.isVerifying || !team.teamCode}
+                        className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold uppercase tracking-wider text-sm transition-all disabled:opacity-50"
+                      >
+                        {team.isVerifying ? 'Verifying...' : 'Verify'}
+                      </button>
                     </div>
-                  ))}
-                </div>
-                {team.teamMembers.length < (ev.maxTeamSize - 1) && (
-                  <button
-                    type="button"
-                    onClick={() => addMember(ev.slug, ev.maxTeamSize)}
-                    className="mt-6 flex items-center justify-center gap-2 w-full py-4 rounded-xl bg-white/5 border border-white/10 border-dashed text-sm font-bold uppercase tracking-wider text-gray-400 hover:text-white hover:bg-white/10 transition-all"
-                  >
-                    <Plus size={16} />
-                    Add Operative Unit
-                  </button>
+                    {team.verificationError && <p className="text-xs text-red-500 mt-2 font-medium">{team.verificationError}</p>}
+
+                    {team.verifiedTeam && (
+                      <div className="mt-6 p-5 rounded-xl bg-white/5 border border-green-500/30">
+                        <div className="flex items-center gap-2 text-green-500 font-bold mb-3">
+                          <CheckSquare size={18} /> Team Found
+                        </div>
+                        <p className="text-sm text-gray-300 mb-1"><strong className="text-white">Name:</strong> {team.verifiedTeam.teamName}</p>
+                        <p className="text-sm text-gray-300 mb-1"><strong className="text-white">Leader:</strong> {team.verifiedTeam.leader}</p>
+                        <p className="text-sm text-gray-300"><strong className="text-white">Members:</strong> {team.verifiedTeam.memberCount} / {team.verifiedTeam.maxSize}</p>
+                        <ul className="mt-2 text-xs text-gray-400 list-disc list-inside">
+                          {team.verifiedTeam.members.map((m, idx) => <li key={idx}>{m}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
                 )}
               </motion.div>
             );

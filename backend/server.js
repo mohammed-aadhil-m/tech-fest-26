@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-require('dotenv').config();
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
@@ -16,6 +16,7 @@ const galleryRoutes = require('./routes/gallery');
 const settingRoutes = require('./routes/settings');
 const adminRoutes = require('./routes/admin');
 const paymentRoutes = require('./routes/payments');
+const teamRoutes = require('./routes/teams');
 
 // Connect to MongoDB
 connectDB();
@@ -44,6 +45,7 @@ app.use('/api/winners', winnerRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/settings', settingRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/teams', teamRoutes);
 
 // Admin API Routes (all protected)
 app.use('/api/admin', adminRoutes);

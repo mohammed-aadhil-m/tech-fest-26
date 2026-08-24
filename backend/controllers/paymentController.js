@@ -1,5 +1,5 @@
 const Payment = require('../models/Payment');
-const Registration = require('../models/Registration');
+const EventRegistration = require('../models/EventRegistration');
 const { sendRegistrationEmail } = require('../utils/emailSender');
 const path = require('path');
 
@@ -16,7 +16,7 @@ exports.createPayment = async (req, res, next) => {
     }
 
     // Verify registration exists
-    const reg = await Registration.findOne({ registrationId });
+    const reg = await EventRegistration.findOne({ registrationId }).populate('user');
     if (!reg) {
       return res.status(404).json({ success: false, message: 'Registration not found.' });
     }
@@ -43,14 +43,27 @@ exports.createPayment = async (req, res, next) => {
       screenshotUrl,
     });
 
-    // Update registration paymentStatus to pending
-    await Registration.findOneAndUpdate(
-      { registrationId },
+    // Update all unpaid registrations for this user to pending
+    await EventRegistration.updateMany(
+      { user: reg.user._id, paymentStatus: 'unpaid' },
       { paymentStatus: 'pending', updatedAt: Date.now() }
     );
 
+    // Fetch all user's registrations to include in the email
+    const allUserRegs = await EventRegistration.find({ user: reg.user._id })
+      .populate('event', 'name slug')
+      .populate('team');
+      
+    const registeredEvents = allUserRegs.map(r => ({
+      eventName: r.event?.name,
+      eventSlug: r.event?.slug,
+      isTeamRegistration: r.registrationType === 'TEAM',
+      teamName: r.team?.teamName,
+      teamLeader: r.team?.teamCode // just showing team code as proxy for now
+    }));
+
     // Send confirmation email asynchronously
-    sendRegistrationEmail(reg.email, reg.fullName, reg.registrationId, reg.events, reg.foodPreference);
+    sendRegistrationEmail(reg.user.email, reg.user.fullName, reg.registrationId, registeredEvents, reg.user.foodPreference);
 
     res.status(201).json({ success: true, data: payment });
   } catch (err) { next(err); }
@@ -86,11 +99,14 @@ exports.updatePayment = async (req, res, next) => {
     const payment = await Payment.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
     if (!payment) return res.status(404).json({ success: false, message: 'Payment not found.' });
 
-    // Sync paymentStatus to Registration
-    await Registration.findOneAndUpdate(
-      { registrationId: payment.registrationId },
-      { paymentStatus: payment.status === 'verified' ? 'paid' : payment.status, updatedAt: Date.now() }
-    );
+    // Sync paymentStatus to EventRegistrations
+    const reg = await EventRegistration.findOne({ registrationId: payment.registrationId });
+    if (reg) {
+      await EventRegistration.updateMany(
+        { user: reg.user, paymentStatus: 'pending' },
+        { paymentStatus: payment.status === 'verified' ? 'paid' : payment.status, updatedAt: Date.now() }
+      );
+    }
 
     res.json({ success: true, data: payment });
   } catch (err) { next(err); }

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Filter, Camera } from 'lucide-react';
 import api from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
+import ThreeBackground from '../components/ThreeBackground';
 
 const CATEGORIES = [
   { id: 'all', label: 'All Files' },
@@ -41,10 +42,12 @@ export default function Gallery() {
     : images.filter(img => img.category === activeCategory);
 
   return (
-    <div className="min-h-screen bg-[#050505] selection:bg-red-500/30 selection:text-white">
+    <div className="min-h-screen bg-[#050505] selection:bg-red-500/30 selection:text-white relative overflow-hidden">
+      <ThreeBackground />
+      <div className="relative z-10">
+      
       {/* Header */}
-      <div className="relative border-b border-white/5 py-24 overflow-hidden">
-        <div className="absolute inset-0 bg-[#0a0a0c]"></div>
+      <div className="relative border-b border-white/5 py-24">
         <div className="absolute inset-0 circuit-bg opacity-30"></div>
         <div className="absolute top-0 right-1/4 w-96 h-96 bg-red-500/10 blur-[120px] rounded-full pointer-events-none"></div>
         
@@ -187,6 +190,7 @@ export default function Gallery() {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
     </div>
   );
 }

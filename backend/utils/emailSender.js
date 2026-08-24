@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-require('dotenv').config();
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -37,6 +37,14 @@ const sendRegistrationEmail = async (userEmail, userName, registrationId, regist
             `).join('')}
           </ul>
         </div>
+
+        ${registeredEvents.some(e => e.eventName.toLowerCase().includes('paper presentation') || (e.eventSlug && e.eventSlug === 'paper-presentation')) ? `
+        <div style="background-color: #fff0f0; padding: 15px; border-radius: 8px; border: 1px solid #ffc1c1; margin-bottom: 20px;">
+          <h4 style="margin-top: 0; color: #C40001;">📄 Paper Presentation Instructions</h4>
+          <p style="color: #555555; font-size: 14px;">Please upload your presentation slides and paper to the designated Google Drive folder before the event deadline. Maximum 7 participants will present their paper (3 minutes presentation + judge evaluation).</p>
+          <a href="https://drive.google.com/drive/folders/14Gj5s7asChOCzOuOoHwU05oFxZaxgi-k" target="_blank" style="display: inline-block; margin-top: 10px; padding: 10px 20px; background-color: #C40001; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold;">Upload to Google Drive</a>
+        </div>
+        ` : ''}
 
         <p>We look forward to seeing you at the event.</p>
         <br />

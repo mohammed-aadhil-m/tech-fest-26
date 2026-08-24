@@ -27,12 +27,15 @@ import AdminWinners from './pages/admin/AdminWinners';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminEvents from './pages/admin/AdminEvents';
 
+import BottomNav from './components/BottomNav';
+
 // Public Layout wrapper
 function PublicLayout({ children }) {
   return (
     <>
-      <main>{children}</main>
+      <main className="pb-24">{children}</main>
       <Footer />
+      <BottomNav />
     </>
   );
 }

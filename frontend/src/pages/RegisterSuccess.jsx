@@ -1,23 +1,30 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Download, CheckCircle, Home, Calendar, QrCode, Fingerprint, ShieldCheck } from 'lucide-react';
+import { Download, CheckCircle, Home, QrCode, Fingerprint, ShieldCheck, Users, Copy } from 'lucide-react';
 import api from '../services/api';
+import { useToast } from '../context/ToastContext';
 import { PageLoader } from '../components/LoadingSpinner';
 
 export default function RegisterSuccess() {
   const { registrationId } = useParams();
-  const [registration, setRegistration] = useState(null);
+  const [registrations, setRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
   const passRef = useRef(null);
+  const toast = useToast();
 
   useEffect(() => {
     if (!registrationId) return;
     api.get(`/registrations/${registrationId}`)
-      .then(res => setRegistration(res.data.data))
+      .then(res => setRegistrations(res.data.data))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [registrationId]);
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    toast.success('Team Code copied to clipboard!');
+  };
 
   const downloadPass = async () => {
     const { default: html2canvas } = await import('html2canvas');
@@ -28,14 +35,14 @@ export default function RegisterSuccess() {
       backgroundColor: '#050505',
     });
     const imgData = canvas.toDataURL('image/jpeg', 1.0);
-    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [90, 130] });
-    pdf.addImage(imgData, 'JPEG', 0, 0, 90, 130);
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [100, 150] });
+    pdf.addImage(imgData, 'JPEG', 0, 0, 100, 150);
     pdf.save(`TECHFEST26_NODE_${registrationId}.pdf`);
   };
 
   if (loading) return <div className="pt-24 min-h-screen bg-[#050505]"><PageLoader /></div>;
 
-  if (!registration) {
+  if (!registrations || registrations.length === 0) {
     return (
       <div className="min-h-screen bg-[#050505] pt-32 flex flex-col items-center justify-center text-center px-4 relative">
         <div className="absolute inset-0 grid-bg opacity-10"></div>
@@ -52,6 +59,10 @@ export default function RegisterSuccess() {
       </div>
     );
   }
+
+  const user = registrations[0].user;
+  const teamEvents = registrations.filter(r => r.registrationType === 'TEAM');
+  const individualEvents = registrations.filter(r => r.registrationType === 'INDIVIDUAL');
 
   return (
     <div className="min-h-screen bg-[#050505] selection:bg-red-500/30 selection:text-white relative overflow-hidden pt-24 pb-16">
@@ -85,7 +96,7 @@ export default function RegisterSuccess() {
           </div>
         </motion.div>
 
-        {/* Event Pass */}
+        {/* Event Pass / Dashboard View */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -97,7 +108,6 @@ export default function RegisterSuccess() {
             className="bg-[#050505] rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(255,42,42,0.1)] border border-red-500/30 mb-8 relative"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
-            {/* Cyberpunk lines */}
             <div className="absolute top-0 left-10 w-[1px] h-full bg-red-500/20 z-0"></div>
             <div className="absolute top-0 right-10 w-[1px] h-full bg-white/5 z-0"></div>
 
@@ -128,66 +138,83 @@ export default function RegisterSuccess() {
 
             {/* Pass Body */}
             <div className="p-8 relative z-10 bg-black/40 backdrop-blur-sm">
-              <div className="flex items-start justify-between gap-6">
-                <div className="flex-1 space-y-6">
+              <div className="flex items-start justify-between gap-6 mb-6">
+                <div className="flex-1 space-y-4">
                   <div>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Designation</p>
-                    <p className="text-xl font-display font-black text-white tracking-wide uppercase">{registration.fullName}</p>
+                    <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Name</p>
+                    <p className="text-xl font-display font-black text-white tracking-wide uppercase">{user.fullName}</p>
                   </div>
-                  
-                  <div>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-2">Active Protocols</p>
-                    {(registration.events && registration.events.length > 0) ? (
-                      <div className="flex flex-wrap gap-2">
-                        {registration.events.map((e, i) => (
-                          <span
-                            key={i}
-                            className="inline-flex items-center px-3 py-1 bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold uppercase tracking-wider rounded-md"
-                          >
-                            {e.eventName}
-                          </span>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-sm font-bold text-red-400 uppercase tracking-wider">{registration.eventName}</p>
-                    )}
-                  </div>
-                  
-                  {registration.events?.some(e => e.teamName) && (
-                    <div>
-                      <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-2">Squad Assignments</p>
-                      <div className="space-y-1">
-                        {registration.events.filter(e => e.teamName).map((e, i) => (
-                          <div key={i} className="flex items-center gap-2">
-                            <span className="text-xs text-gray-400">{e.eventName}:</span>
-                            <span className="text-xs font-bold text-white uppercase tracking-wider">{e.teamName}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Base</p>
-                      <p className="text-sm font-bold text-white uppercase">{registration.college}</p>
+                      <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">College</p>
+                      <p className="text-sm font-bold text-white uppercase">{user.college}</p>
                     </div>
                     <div>
                       <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Division</p>
-                      <p className="text-sm font-bold text-white uppercase">{registration.department} - {registration.year}</p>
+                      <p className="text-sm font-bold text-white uppercase">{user.department} - {user.year}</p>
                     </div>
                   </div>
                 </div>
                 
-                {/* QR Code Placeholder */}
-                <div className="hidden sm:flex flex-col items-center">
-                  <div className="w-24 h-24 bg-white/5 border border-white/20 rounded-xl flex items-center justify-center p-2 mb-2 relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-red-500/10 translate-y-full group-hover:translate-y-0 transition-transform duration-1000 ease-in-out"></div>
-                    <QrCode size={48} className="text-white/40 group-hover:text-red-500 transition-colors duration-500" />
-                  </div>
-                  <p className="text-[8px] text-gray-500 uppercase tracking-widest text-center font-mono">Scan at Entry</p>
-                </div>
+
               </div>
+
+              {/* Individual Events Section */}
+              {individualEvents.length > 0 && (
+                <div className="mb-6">
+                  <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-3 border-b border-white/10 pb-1">Individual Protocols</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {individualEvents.map((r, i) => (
+                      <div key={i} className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/10">
+                        <span className="text-xl">{r.event.icon}</span>
+                        <div>
+                          <p className="text-sm font-bold text-white">{r.event.name}</p>
+                          <p className="text-[10px] text-gray-400 uppercase tracking-wider">{r.status}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Team Events Section */}
+              {teamEvents.length > 0 && (
+                <div className="mb-6">
+                  <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-3 border-b border-white/10 pb-1">Squad Assignments (Team Events)</p>
+                  <div className="space-y-4">
+                    {teamEvents.map((r, i) => (
+                      <div key={i} className="bg-red-500/5 p-4 rounded-xl border border-red-500/20 relative">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Users size={16} className="text-red-500" />
+                          <p className="text-sm font-bold text-white uppercase tracking-wider">{r.event.name}</p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 mt-3">
+                          <div>
+                            <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Squad Name</p>
+                            <p className="text-sm font-bold text-gray-300">{r.team.teamName}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Access Code</p>
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-mono font-bold text-red-400 tracking-widest">{r.team.teamCode}</p>
+                              <button onClick={() => copyToClipboard(r.team.teamCode)} className="text-gray-400 hover:text-white transition-colors" title="Copy Team Code">
+                                <Copy size={14} />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="mt-3 bg-black/50 p-2 rounded-lg border border-white/5">
+                          <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Operatives ({r.team.members.length})</p>
+                          <p className="text-xs text-gray-300">
+                            {r.team.members.map(m => m.fullName).join(' • ')}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Divider */}
               <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-white/20 to-transparent my-6" />
@@ -237,9 +264,9 @@ export default function RegisterSuccess() {
               <CheckCircle size={16} className="text-red-500" />
             </div>
             <div>
-              <p className="text-sm font-bold text-white mb-1 uppercase tracking-wider">Maintain Physical Copy</p>
+              <p className="text-sm font-bold text-white mb-1 uppercase tracking-wider">Share Your Team Code</p>
               <p className="text-xs text-gray-400 leading-relaxed">
-                Your authorization has been logged. Download and retain this clearance pass. Presentation is mandatory for physical access to the facility.
+                If you created a team, share the <strong className="text-white">Access Code</strong> with your teammates so they can join your squad when they register.
               </p>
             </div>
           </div>

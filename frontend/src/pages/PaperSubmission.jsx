@@ -4,6 +4,7 @@ import { FileText, Upload, CheckCircle, UploadCloud } from 'lucide-react';
 import api from '../services/api';
 import { useToast } from '../context/ToastContext';
 import LoadingSpinner from '../components/LoadingSpinner';
+import ThreeBackground from '../components/ThreeBackground';
 
 export default function PaperSubmission() {
   const toast = useToast();
@@ -44,7 +45,7 @@ export default function PaperSubmission() {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setSubmitted(true);
-      toast.success('Data transmitted successfully!');
+      toast.success('Packet transmitted successfully.');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Transmission failed. Please attempt again.');
     } finally {
@@ -55,9 +56,7 @@ export default function PaperSubmission() {
   if (submitted) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 bg-[#050505] relative overflow-hidden">
-        <div className="absolute inset-0 bg-[#0a0a0c]"></div>
-        <div className="absolute inset-0 grid-bg opacity-10"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-red-500/10 blur-[100px] rounded-full"></div>
+        <ThreeBackground />
         
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center max-w-md relative z-10 card bg-black/60 border border-white/10 p-10 backdrop-blur-xl">
           <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8 bg-red-500/10 border border-red-500/20 glow-red">
@@ -74,10 +73,12 @@ export default function PaperSubmission() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] selection:bg-red-500/30 selection:text-white">
+    <div className="min-h-screen bg-[#050505] selection:bg-red-500/30 selection:text-white relative overflow-hidden">
+      <ThreeBackground />
+      <div className="relative z-10">
+      
       {/* Header */}
-      <div className="relative border-b border-white/5 py-24 overflow-hidden">
-        <div className="absolute inset-0 bg-[#0a0a0c]"></div>
+      <div className="relative border-b border-white/5 py-24">
         <div className="absolute inset-0 circuit-bg opacity-30"></div>
         <div className="absolute top-0 right-1/4 w-96 h-96 bg-red-500/10 blur-[120px] rounded-full pointer-events-none"></div>
         
@@ -219,6 +220,7 @@ export default function PaperSubmission() {
             </p>
           </div>
         </form>
+      </div>
       </div>
     </div>
   );
