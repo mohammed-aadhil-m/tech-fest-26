@@ -5,6 +5,7 @@ import { Upload, X, CreditCard, Phone, Hash, CheckCircle, Home, AlertCircle } fr
 import api from '../services/api';
 import { useToast } from '../context/ToastContext';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { QRCodeSVG } from 'qrcode.react';
 
 // Replace this URL with your actual UPI/payment QR code image path or URL
 const QR_CODE_IMAGE = null; // Set to '/qr-payment.png' once you add the image to /public
@@ -125,22 +126,18 @@ export default function Payment() {
               <CreditCard size={24} />
             </div>
             <h2 className="text-2xl font-display font-bold text-white mb-6">Scan to Transfer</h2>
-            {QR_CODE_IMAGE ? (
-              <div className="p-3 bg-white rounded-2xl shadow-[0_0_30px_rgba(255,42,42,0.15)] border border-red-500/20">
-                <img
-                  src={QR_CODE_IMAGE}
-                  alt="Payment QR Code"
-                  className="w-48 h-48 object-contain rounded-xl"
-                />
+            <div className="p-4 bg-white rounded-2xl shadow-[0_0_30px_rgba(255,42,42,0.15)] border border-red-500/20 flex flex-col items-center">
+              <QRCodeSVG
+                value="upi://pay?pa=aadhilaadhil8851-2@okicici&pn=Mohammed%20Aadhil%20M&am=250.00"
+                size={160}
+                level="M"
+                includeMargin={false}
+              />
+              <div className="mt-4 text-center">
+                <p className="text-xs text-gray-600 font-bold">UPI ID: aadhilaadhil8851-2@okicici</p>
+                <p className="text-xs text-gray-500 mt-1">Mohammed Aadhil M • ₹250.00</p>
               </div>
-            ) : (
-              <div className="w-48 h-48 rounded-2xl border-2 border-dashed border-white/10 bg-white/5 flex flex-col items-center justify-center gap-3 p-4">
-                <CreditCard size={36} className="text-gray-600" />
-                <p className="text-[10px] uppercase tracking-widest text-gray-500 font-bold text-center">
-                  Terminal Offline.<br/>Awaiting Config.
-                </p>
-              </div>
-            )}
+            </div>
             <p className="text-sm text-gray-400 mt-6 leading-relaxed font-light">
               Use any UPI gateway (GPay, PhonePe, Paytm, etc.) to securely transfer the <strong className="text-white">₹250</strong> processing fee.
             </p>
