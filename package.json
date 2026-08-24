@@ -1,0 +1,10 @@
+{
+  "name": "techfest26-root",
+  "version": "1.0.0",
+  "description": "Root configuration for deploying TECH FEST 26 to Render",
+  "scripts": {
+    "install": "cd backend && npm install && cd ../frontend && npm install",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && npm start"
+  }
+}

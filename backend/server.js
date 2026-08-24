@@ -55,10 +55,19 @@ app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'TECH FEST 26 API is running', timestamp: new Date() });
 });
 
-// 404 Handler
-app.use((req, res) => {
-  res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found.` });
-});
+// Serve frontend in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+  
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../frontend/dist', 'index.html'));
+  });
+} else {
+  // 404 Handler for development API routes
+  app.use((req, res) => {
+    res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found.` });
+  });
+}
 
 // Global Error Handler
 app.use(errorHandler);
