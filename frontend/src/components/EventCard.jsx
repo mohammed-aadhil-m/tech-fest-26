@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { ChevronRight, Users, User } from 'lucide-react';
+import { ChevronRight, Users, User, Clock, MapPin } from 'lucide-react';
 
 const categoryStyles = {
   technical: {
@@ -178,9 +178,26 @@ export default function EventCard({ event, index = 0 }) {
           <h3 className="text-xl font-display font-bold text-white mb-3 group-hover:text-red-400 transition-colors">
             {event.name}
           </h3>
-          <p className="text-sm font-light leading-relaxed text-gray-400 mb-6 flex-grow">
+          <p className="text-sm font-light leading-relaxed text-gray-400 mb-4 flex-grow">
             {description}
           </p>
+
+          {(event.time || event.venue) && !isComingSoon && (
+            <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1.5 mb-4 text-xs">
+              {event.time && (
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-gray-300 text-[11px] font-medium">
+                  <Clock size={12} className="text-red-400 flex-shrink-0" />
+                  <span>{event.time}</span>
+                </div>
+              )}
+              {event.venue && (
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-gray-300 text-[11px] font-medium">
+                  <MapPin size={12} className="text-red-400 flex-shrink-0" />
+                  <span>{event.venue}</span>
+                </div>
+              )}
+            </div>
+          )}
           
           {!isComingSoon && (
             <div className="flex items-center gap-2 text-sm font-bold text-red-500 mt-auto group-hover:gap-3 transition-all duration-300">

@@ -155,6 +155,7 @@ export default function AdminDashboard() {
                 { label: 'Manage Teams', to: '/admin/teams', primary: true },
                 { label: 'View Submissions', to: '/admin/submissions', primary: false },
                 { label: 'Manage Events', to: '/admin/events', primary: false },
+                { label: 'Event Schedule', to: '/admin/schedule', primary: false },
                 { label: 'Update Settings', to: '/admin/settings', primary: false },
               ].map(a => (
                 <Link 

@@ -17,6 +17,7 @@ const settingRoutes = require('./routes/settings');
 const adminRoutes = require('./routes/admin');
 const paymentRoutes = require('./routes/payments');
 const teamRoutes = require('./routes/teams');
+const scheduleRoutes = require('./routes/schedule');
 
 // Connect to MongoDB
 connectDB();
@@ -39,6 +40,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Public API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
+app.use('/api/schedule', scheduleRoutes);
 app.use('/api/registrations', registrationRoutes);
 app.use('/api/submissions', submissionRoutes);
 app.use('/api/winners', winnerRoutes);

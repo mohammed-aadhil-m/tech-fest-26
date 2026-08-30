@@ -27,6 +27,7 @@ import AdminSubmissions from './pages/admin/AdminSubmissions';
 import AdminWinners from './pages/admin/AdminWinners';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminEvents from './pages/admin/AdminEvents';
+import AdminSchedule from './pages/admin/AdminSchedule';
 
 import BottomNav from './components/BottomNav';
 import ScrollToTop from './components/ScrollToTop';
@@ -73,6 +74,7 @@ export default function App() {
               <Route path="registrations" element={<AdminRegistrations />} />
               <Route path="teams" element={<AdminTeams />} />
               <Route path="events" element={<AdminEvents />} />
+              <Route path="schedule" element={<AdminSchedule />} />
               <Route path="submissions" element={<AdminSubmissions />} />
               <Route path="winners" element={<AdminWinners />} />
               <Route path="settings" element={<AdminSettings />} />

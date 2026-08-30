@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  LayoutDashboard, Users, CalendarDays, FileText, Trophy,
+  LayoutDashboard, Users, CalendarDays, Clock, FileText, Trophy,
   Settings, LogOut, Menu, X, ChevronRight, Shield
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -12,6 +12,7 @@ const navItems = [
   { label: 'Registrations', to: '/admin/registrations', icon: Users },
   { label: 'Teams', to: '/admin/teams', icon: Shield },
   { label: 'Events', to: '/admin/events', icon: CalendarDays },
+  { label: 'Event Schedule', to: '/admin/schedule', icon: Clock },
   { label: 'Paper Submissions', to: '/admin/submissions', icon: FileText },
   { label: 'Winners', to: '/admin/winners', icon: Trophy },
   { label: 'Settings', to: '/admin/settings', icon: Settings },

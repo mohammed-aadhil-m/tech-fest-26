@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight, Clock, MapPin, CalendarDays } from 'lucide-react';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -25,8 +26,13 @@ export default function AdminEvents() {
     slug: '',
     icon: '🎯',
     category: 'technical',
+    time: '',
+    venue: '',
     description: '',
     rules: '',
+    isTeamEvent: false,
+    minTeamSize: 1,
+    maxTeamSize: 1,
   });
 
   const fetch = useCallback(async () => {
@@ -66,8 +72,13 @@ export default function AdminEvents() {
       slug: event.slug || '',
       icon: event.icon || '🎯',
       category: event.category || 'technical',
+      time: event.time || '',
+      venue: event.venue || '',
       description: event.description || '',
       rules: event.rules ? event.rules.join('\n') : '',
+      isTeamEvent: !!event.isTeamEvent,
+      minTeamSize: event.minTeamSize || 1,
+      maxTeamSize: event.maxTeamSize || (event.isTeamEvent ? 2 : 1),
     });
     setIsModalOpen(true);
   };
@@ -79,8 +90,13 @@ export default function AdminEvents() {
       slug: '',
       icon: '🎯',
       category: 'technical',
+      time: '',
+      venue: '',
       description: '',
       rules: '',
+      isTeamEvent: false,
+      minTeamSize: 1,
+      maxTeamSize: 1,
     });
     setIsModalOpen(true);
   };
@@ -89,6 +105,8 @@ export default function AdminEvents() {
     e.preventDefault();
     const payload = {
       ...formData,
+      minTeamSize: Number(formData.minTeamSize) || 1,
+      maxTeamSize: Number(formData.maxTeamSize) || 1,
       rules: formData.rules.split('\n').map(r => r.trim()).filter(r => r)
     };
     try {
@@ -111,12 +129,24 @@ export default function AdminEvents() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-display font-black text-white tracking-wide">Event <span className="text-red-500">Management</span></h1>
-          <p className="text-sm text-gray-400 mt-1 uppercase tracking-wider font-bold">Manage all TECH FEST '26 events</p>
+          <p className="text-sm text-gray-400 mt-1 uppercase tracking-wider font-bold">Manage TECH FEST '26 events, times, venues & rules</p>
         </div>
-        <button onClick={handleAdd} className="bg-red-600 hover:bg-red-500 text-white font-bold uppercase tracking-widest text-xs py-3 px-6 rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(220,38,38,0.4)] flex items-center gap-2">
-          <Plus size={16} />
-          Add New Event
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            to="/admin/schedule"
+            className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold uppercase tracking-widest text-xs py-3 px-5 rounded-xl transition-all duration-300 flex items-center gap-2"
+          >
+            <Clock size={15} className="text-red-400" />
+            Manage Event Schedule
+          </Link>
+          <button
+            onClick={handleAdd}
+            className="bg-red-600 hover:bg-red-500 text-white font-bold uppercase tracking-widest text-xs py-3 px-6 rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(220,38,38,0.4)] flex items-center gap-2"
+          >
+            <Plus size={16} />
+            Add New Event
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -129,6 +159,7 @@ export default function AdminEvents() {
                 <tr>
                   <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Event Name</th>
                   <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Category</th>
+                  <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Time & Venue</th>
                   <th className="px-6 py-4 text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">Format</th>
                   <th className="px-6 py-4 text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">Registration Status</th>
                   <th className="px-6 py-4 text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
@@ -140,7 +171,7 @@ export default function AdminEvents() {
                   <tr key={event._id} className="hover:bg-white/5 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-red-500/10 border border-red-500/30 rounded-xl flex items-center justify-center text-xl glow-red">
+                        <div className="w-10 h-10 bg-red-500/10 border border-red-500/30 rounded-xl flex items-center justify-center text-xl glow-red flex-shrink-0">
                           {event.icon}
                         </div>
                         <div>
@@ -157,6 +188,18 @@ export default function AdminEvents() {
                       }`}>
                         {event.category}
                       </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1.5 text-xs text-gray-300">
+                          <Clock size={12} className="text-red-400 flex-shrink-0" />
+                          <span>{event.time || <span className="text-gray-600 italic">Not set</span>}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                          <MapPin size={12} className="text-red-400 flex-shrink-0" />
+                          <span className="truncate max-w-[180px]">{event.venue || <span className="text-gray-600 italic">Not set</span>}</span>
+                        </div>
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">
                       {event.isTeamEvent ? `Squad (${event.minTeamSize}-${event.maxTeamSize})` : 'Solo'}
@@ -191,14 +234,14 @@ export default function AdminEvents() {
                         <button
                           onClick={() => handleEdit(event)}
                           className="p-2 text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-all border border-transparent hover:border-blue-500/30"
-                          title="Modify Protocol"
+                          title="Edit Event"
                         >
                           <Pencil size={15} />
                         </button>
                         <button
                           onClick={() => setDeleteTarget(event)}
                           className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all border border-transparent hover:border-red-500/30"
-                          title="Delete Protocol"
+                          title="Delete Event"
                         >
                           <Trash2 size={15} />
                         </button>
@@ -217,49 +260,78 @@ export default function AdminEvents() {
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
         loading={deleting}
-        title="Terminate Event Protocol"
-        message={`Delete "${deleteTarget?.name}"? All associated data will be purged from the system.`}
+        title="Delete Event"
+        message={`Are you sure you want to delete "${deleteTarget?.name}"? All associated event details will be permanently removed.`}
       />
 
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={currentEvent ? 'Modify Event Protocol' : 'Initialize Event Protocol'}
+        title={currentEvent ? 'Edit Event Details' : 'Create New Event'}
         size="lg"
       >
         <form onSubmit={handleSubmit} className="p-6 space-y-5 bg-[#050505]">
-          <div className="grid grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <label className="block text-[10px] font-bold text-red-500 uppercase tracking-widest mb-2">Event Designation</label>
+              <label className="block text-[10px] font-bold text-red-500 uppercase tracking-widest mb-2">Event Name</label>
               <input
                 type="text"
                 required
-                className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all font-mono"
+                className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all"
                 value={formData.name}
                 onChange={e => setFormData({ ...formData, name: e.target.value })}
+                placeholder="e.g. Bug Buster"
               />
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-red-500 uppercase tracking-widest mb-2">System Slug</label>
+              <label className="block text-[10px] font-bold text-red-500 uppercase tracking-widest mb-2">URL Slug</label>
               <input
                 type="text"
                 required
-                className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all font-mono"
+                className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all font-mono text-sm"
                 value={formData.slug}
                 onChange={e => setFormData({ ...formData, slug: e.target.value })}
+                placeholder="e.g. bug-buster"
               />
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-red-500 uppercase tracking-widest mb-2">Visual Identifier</label>
+              <label className="block text-[10px] font-bold text-red-500 uppercase tracking-widest mb-2">Event Time / Timing</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  className="w-full bg-black/60 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all"
+                  value={formData.time}
+                  onChange={e => setFormData({ ...formData, time: e.target.value })}
+                  placeholder="e.g. 10:30 AM - 12:30 PM"
+                />
+                <Clock size={16} className="absolute left-3.5 top-3.5 text-gray-500" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-red-500 uppercase tracking-widest mb-2">Event Venue / Location</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  className="w-full bg-black/60 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all"
+                  value={formData.venue}
+                  onChange={e => setFormData({ ...formData, venue: e.target.value })}
+                  placeholder="e.g. Lab 2, CSE Block"
+                />
+                <MapPin size={16} className="absolute left-3.5 top-3.5 text-gray-500" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-red-500 uppercase tracking-widest mb-2">Visual Icon (Emoji)</label>
               <input
                 type="text"
                 className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all text-xl text-center"
                 value={formData.icon}
                 onChange={e => setFormData({ ...formData, icon: e.target.value })}
+                placeholder="🎯"
               />
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-red-500 uppercase tracking-widest mb-2">Classification</label>
+              <label className="block text-[10px] font-bold text-red-500 uppercase tracking-widest mb-2">Category</label>
               <select
                 className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all appearance-none"
                 value={formData.category}
@@ -270,21 +342,66 @@ export default function AdminEvents() {
                 <option value="coming-soon">Coming Soon</option>
               </select>
             </div>
+            <div>
+              <label className="block text-[10px] font-bold text-red-500 uppercase tracking-widest mb-2">Format</label>
+              <select
+                className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all appearance-none"
+                value={formData.isTeamEvent ? 'team' : 'solo'}
+                onChange={e => {
+                  const isTeam = e.target.value === 'team';
+                  setFormData({
+                    ...formData,
+                    isTeamEvent: isTeam,
+                    minTeamSize: isTeam ? 1 : 1,
+                    maxTeamSize: isTeam ? 2 : 1
+                  });
+                }}
+              >
+                <option value="solo">Solo Event (Individual)</option>
+                <option value="team">Team Event (Squad)</option>
+              </select>
+            </div>
+            {formData.isTeamEvent && (
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Min Team</label>
+                  <input
+                    type="number"
+                    min="1"
+                    className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-500"
+                    value={formData.minTeamSize}
+                    onChange={e => setFormData({ ...formData, minTeamSize: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Max Team</label>
+                  <input
+                    type="number"
+                    min="1"
+                    className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-500"
+                    value={formData.maxTeamSize}
+                    onChange={e => setFormData({ ...formData, maxTeamSize: e.target.value })}
+                  />
+                </div>
+              </div>
+            )}
           </div>
           <div>
-            <label className="block text-[10px] font-bold text-red-500 uppercase tracking-widest mb-2">Protocol Description</label>
+            <label className="block text-[10px] font-bold text-red-500 uppercase tracking-widest mb-2">Description</label>
             <textarea
               className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all min-h-[100px]"
               value={formData.description}
               onChange={e => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Brief description of the event..."
             />
           </div>
           <div>
-            <label className="block text-[10px] font-bold text-red-500 uppercase tracking-widest mb-2">Operating Parameters (One per line)</label>
+            <label className="block text-[10px] font-bold text-red-500 uppercase tracking-widest mb-2">Rules & Guidelines (One per line)</label>
             <textarea
               className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all min-h-[120px] font-mono text-sm"
               value={formData.rules}
               onChange={e => setFormData({ ...formData, rules: e.target.value })}
+              placeholder="Rule 1&#10;Rule 2&#10;Rule 3"
             />
           </div>
           <div className="flex justify-end gap-4 pt-6 border-t border-white/10">
@@ -293,10 +410,10 @@ export default function AdminEvents() {
               onClick={() => setIsModalOpen(false)}
               className="px-6 py-3 text-xs font-bold uppercase tracking-widest text-gray-400 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:text-white transition-all"
             >
-              Abort
+              Cancel
             </button>
             <button type="submit" className="bg-red-600 hover:bg-red-500 text-white font-bold uppercase tracking-widest text-xs py-3 px-6 rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(220,38,38,0.4)]">
-              {currentEvent ? 'Update Protocol' : 'Execute Creation'}
+              {currentEvent ? 'Save Changes' : 'Create Event'}
             </button>
           </div>
         </form>

@@ -82,17 +82,40 @@ const stats = [
   { icon: <Code2 size={24} />, label: 'Edition', value: '2026' },
 ];
 
+const DEFAULT_SCHEDULE = [
+  { time: '09:00 AM', title: 'Registration & Check-in', desc: 'Arrive at campus, check-in, and collect your event pass.', venue: 'Registration Desk, Main Block' },
+  { time: '09:30 AM', title: 'Inauguration Ceremony', desc: 'Opening ceremony and welcome address by dignitaries.', venue: 'Auditorium' },
+  { time: '10:30 AM', title: 'Technical Events Begin', desc: 'Paper Presentation, Dev & Deploy, Bug Buster.', venue: 'Respective Labs & Seminar Halls' },
+  { time: '12:30 PM', title: 'Lunch Break', desc: 'Enjoy delicious lunch and refreshments provided on campus.', venue: 'Cafeteria' },
+  { time: '01:30 PM', title: 'Non-Technical Events Begin', desc: 'Treasure Hunt 2.0, Connect & Sketch, Adaptune.', venue: 'Respective Venues' },
+  { time: '03:30 PM', title: 'Valedictory & Prize Distribution', desc: 'Closing ceremony, certificate distribution, and winner announcements.', venue: 'Auditorium' },
+];
+
 const HERO_WORDS = ["CREATE", "DECODE", "INNOVATE", "COMPETE"];
 
 export default function Home() {
   const [settings, setSettings] = useState({});
+  const [schedule, setSchedule] = useState(DEFAULT_SCHEDULE);
   const [wordIndex, setWordIndex] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const settingsRes = await api.get('/settings');
-        setSettings(settingsRes.data.data || {});
+        const [settingsRes, scheduleRes] = await Promise.allSettled([
+          api.get('/settings'),
+          api.get('/schedule')
+        ]);
+        if (settingsRes.status === 'fulfilled' && settingsRes.value.data?.data) {
+          setSettings(settingsRes.value.data.data);
+        }
+        if (scheduleRes.status === 'fulfilled' && scheduleRes.value.data?.data && scheduleRes.value.data.data.length > 0) {
+          setSchedule(scheduleRes.value.data.data.map(item => ({
+            time: item.time,
+            title: item.title,
+            desc: item.description || item.desc || '',
+            venue: item.venue || ''
+          })));
+        }
       } catch {
         // fail silently on home
       }
@@ -326,14 +349,7 @@ export default function Home() {
           </motion.div>
 
           <div className="relative border-l border-red-500/30 ml-4 md:ml-8 space-y-12 pb-8">
-            {[
-              { time: '09:00 AM', title: 'Registration & Check-in', desc: 'Arrive at campus, check-in, and collect your event pass.' },
-              { time: '09:30 AM', title: 'Inauguration Ceremony', desc: 'Opening ceremony and welcome address by dignitaries.' },
-              { time: '10:30 AM', title: 'Technical Events Begin', desc: 'Paper Presentation, Dev & Deploy, Bug Buster.' },
-              { time: '12:30 PM', title: 'Lunch Break', desc: 'Enjoy delicious lunch and refreshments provided on campus.' },
-              { time: '01:30 PM', title: 'Non-Technical Events Begin', desc: 'Treasure Hunt 2.0, Connect & Sketch, Adaptune.' },
-              { time: '03:30 PM', title: 'Valedictory & Prize Distribution', desc: 'Closing ceremony, certificate distribution, and winner announcements.' },
-            ].map((item, index) => (
+            {schedule.map((item, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, x: -30 }}
@@ -347,9 +363,17 @@ export default function Home() {
                 <div className="absolute -left-[9px] top-[0px] w-[11px] h-[11px] rounded-full border border-red-500/50 animate-ping" />
                 
                 <div className="card-hover">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Clock size={14} className="text-red-500" />
-                    <span className="text-red-400 font-mono font-bold text-sm tracking-wide">{item.time}</span>
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2">
+                      <Clock size={14} className="text-red-500" />
+                      <span className="text-red-400 font-mono font-bold text-sm tracking-wide">{item.time}</span>
+                    </div>
+                    {item.venue && (
+                      <div className="flex items-center gap-1.5 text-xs text-gray-400 bg-white/5 border border-white/10 px-2.5 py-0.5 rounded-md">
+                        <MapPin size={11} className="text-red-400" />
+                        <span>{item.venue}</span>
+                      </div>
+                    )}
                   </div>
                   <h3 className="text-xl font-display font-bold text-white mb-2">{item.title}</h3>
                   <p className="text-gray-400 text-sm leading-relaxed">{item.desc}</p>

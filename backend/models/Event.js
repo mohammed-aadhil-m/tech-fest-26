@@ -20,6 +20,8 @@ const eventSchema = new mongoose.Schema({
     description: String
   }],
   tagline: { type: String },
+  time: { type: String, trim: true, default: '' },
+  venue: { type: String, trim: true, default: '' },
   submissionEmail: { type: String },
   submissionDeadline: { type: Date },
   maxTeamSize: { type: Number, default: 1 },

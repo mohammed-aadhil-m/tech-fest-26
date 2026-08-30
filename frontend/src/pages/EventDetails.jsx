@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ChevronRight, Mail, Calendar, Users, User, Clock, CheckCircle } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Mail, Calendar, Users, User, Clock, MapPin, CheckCircle } from 'lucide-react';
 import api from '../services/api';
 import { PageLoader } from '../components/LoadingSpinner';
 import ThreeBackground from '../components/ThreeBackground';
@@ -129,9 +129,21 @@ export default function EventDetails() {
 
             {/* Meta info */}
             <div className="mt-6 flex flex-wrap gap-4">
+              {event.time && (
+                <div className="flex items-center gap-2 text-sm text-gray-300 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5">
+                  <Clock size={15} className="text-red-500 flex-shrink-0" />
+                  <span>Time: <strong>{event.time}</strong></span>
+                </div>
+              )}
+              {event.venue && (
+                <div className="flex items-center gap-2 text-sm text-gray-300 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5">
+                  <MapPin size={15} className="text-red-500 flex-shrink-0" />
+                  <span>Venue: <strong>{event.venue}</strong></span>
+                </div>
+              )}
               {event.submissionDeadline && (
                 <div className="flex items-center gap-2 text-sm text-gray-300 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5">
-                  <Calendar size={15} className="text-red-500" />
+                  <Calendar size={15} className="text-red-500 flex-shrink-0" />
                   <span>Deadline: <strong>{new Date(event.submissionDeadline).toLocaleDateString('en-IN')}</strong></span>
                 </div>
               )}
@@ -298,6 +310,18 @@ export default function EventDetails() {
                   <span className="text-gray-400">Format</span>
                   <span className="font-medium text-white">{event.isTeamEvent ? 'Team' : 'Individual'}</span>
                 </div>
+                {event.time && (
+                  <div className="flex justify-between gap-2">
+                    <span className="text-gray-400">Time</span>
+                    <span className="font-medium text-white text-right">{event.time}</span>
+                  </div>
+                )}
+                {event.venue && (
+                  <div className="flex justify-between gap-2">
+                    <span className="text-gray-400">Venue</span>
+                    <span className="font-medium text-white text-right">{event.venue}</span>
+                  </div>
+                )}
                 {event.isTeamEvent && (
                   <div className="flex justify-between">
                     <span className="text-gray-400">Team Size</span>

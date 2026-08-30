@@ -15,6 +15,8 @@ const { getAllWinners, createWinner, updateWinner, deleteWinner } = require('../
 const { getAllImages, uploadImage, deleteImage } = require('../controllers/galleryController');
 // Setting controllers
 const { getAllSettings, updateSetting, updateSettings } = require('../controllers/settingController');
+// Schedule controllers
+const { getAllSchedule, createSchedule, updateSchedule, deleteSchedule } = require('../controllers/scheduleController');
 // Payment controllers
 const { getAllPayments, updatePayment } = require('../controllers/paymentController');
 // Team controllers
@@ -76,6 +78,12 @@ router.delete('/gallery/:id', deleteImage);
 router.get('/settings', getAllSettings);
 router.put('/settings', updateSettings);
 router.put('/settings/:key', updateSetting);
+
+// Schedule
+router.get('/schedule', getAllSchedule);
+router.post('/schedule', createSchedule);
+router.put('/schedule/:id', updateSchedule);
+router.delete('/schedule/:id', deleteSchedule);
 
 // Payments
 router.get('/payments', getAllPayments);
