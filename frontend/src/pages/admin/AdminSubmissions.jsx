@@ -236,7 +236,14 @@ export default function AdminSubmissions() {
                       </td>
 
                       <td className="px-6 py-4">
-                        <p className="font-bold text-white">{sub.name}</p>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <p className="font-bold text-white">{sub.name}</p>
+                          {sub.registrationId && (
+                            <span className="text-[9px] font-mono font-bold bg-white/10 px-1.5 py-0.5 rounded text-red-400 border border-white/10">
+                              {sub.registrationId}
+                            </span>
+                          )}
+                        </div>
                         <p className="text-[10px] text-gray-500 font-mono mt-0.5">{sub.email}</p>
                         {sub.mobile && <p className="text-[10px] text-gray-400 font-mono">{sub.mobile}</p>}
                       </td>

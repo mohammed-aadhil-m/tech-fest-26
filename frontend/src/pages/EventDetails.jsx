@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ChevronRight, Mail, Calendar, Users, User, Clock, MapPin, CheckCircle } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Mail, Calendar, Users, User, Clock, MapPin, CheckCircle, FileText } from 'lucide-react';
 import api from '../services/api';
 import { PageLoader } from '../components/LoadingSpinner';
 import ThreeBackground from '../components/ThreeBackground';
@@ -282,6 +282,15 @@ export default function EventDetails() {
                   Register Now
                   <ChevronRight size={16} />
                 </Link>
+                {event.slug === 'paper-presentation' && (
+                  <Link
+                    to="/submit-paper"
+                    className="w-full flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 border border-red-500/40 text-sm mb-3 shadow-[0_0_15px_rgba(220,38,38,0.2)]"
+                  >
+                    <FileText size={16} className="text-red-400" />
+                    Submit Your Paper
+                  </Link>
+                )}
                 <Link to="/events" className="w-full flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 border border-white/20 text-sm">
                   View All Events
                 </Link>

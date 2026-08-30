@@ -81,7 +81,7 @@ export default function Contact() {
                 </div>
               </div>
 
-              <div className="relative z-10">
+              <div className="space-y-3 relative z-10">
                 <div className="flex items-start gap-4 p-4 rounded-xl bg-white/5 border border-white/5">
                   <div className="p-2.5 bg-red-500/10 rounded-lg border border-red-500/20 text-red-500 flex-shrink-0 flex items-center justify-center mt-0.5">
                     <MapPin size={18} />
@@ -93,6 +93,21 @@ export default function Contact() {
                       Sathankulam Taluk,<br />
                       Tuticorin District - 628 656
                     </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5">
+                  <div className="p-2.5 bg-red-500/10 rounded-lg border border-red-500/20 text-red-500 flex-shrink-0 flex items-center justify-center">
+                    <Mail size={18} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold mb-1 text-white uppercase tracking-wider">Official Email</p>
+                    <a
+                      href="mailto:techfest.official2026@gmail.com"
+                      className="text-sm text-gray-300 hover:text-red-400 font-mono transition-colors truncate block"
+                    >
+                      techfest.official2026@gmail.com
+                    </a>
                   </div>
                 </div>
               </div>

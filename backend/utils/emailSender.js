@@ -39,10 +39,16 @@ const sendRegistrationEmail = async (userEmail, userName, registrationId, regist
         </div>
 
         ${registeredEvents.some(e => e.eventName && (e.eventName.toLowerCase().includes('paper presentation') || (e.eventSlug && e.eventSlug === 'paper-presentation'))) ? `
-        <div style="background-color: #fff0f0; padding: 15px; border-radius: 8px; border: 1px solid #ffc1c1; margin-bottom: 20px;">
-          <h4 style="margin-top: 0; color: #C40001;">📄 Paper Presentation Instructions</h4>
-          <p style="color: #555555; font-size: 14px;">Please upload your presentation slides and paper to the designated Google Drive folder before the event deadline. Maximum 7 participants will present their paper (3 minutes presentation + judge evaluation).</p>
-          <a href="https://drive.google.com/drive/folders/14Gj5s7asChOCzOuOoHwU05oFxZaxgi-k" target="_blank" style="display: inline-block; margin-top: 10px; padding: 10px 20px; background-color: #C40001; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold;">Upload to Google Drive</a>
+        <div style="background-color: #fff0f0; padding: 16px; border-radius: 8px; border: 1px solid #ffc1c1; margin-bottom: 20px;">
+          <h4 style="margin-top: 0; color: #C40001; font-size: 15px;">📄 Paper Presentation Guidelines</h4>
+          <ul style="padding-left: 20px; color: #444444; font-size: 13px; line-height: 1.6; margin-bottom: 12px;">
+            <li style="margin-bottom: 6px;">Each participant/team will be given 10 minutes to present their paper.</li>
+            <li style="margin-bottom: 6px;">The presentation will be followed by a Q&A session with the judges.</li>
+            <li style="margin-bottom: 6px;">Participants should clearly explain the problem statement, proposed solution, methodology, results, and conclusion.</li>
+            <li style="margin-bottom: 6px;">Presentation slides should be clear, concise, and relevant to the submitted paper.</li>
+            <li style="margin-bottom: 6px;">Participants may upload or update their presentation slides before the submission deadline (04/09/2026).</li>
+            <li style="margin-bottom: 0;">The presentation should be delivered by the registered participant/team members.</li>
+          </ul>
         </div>
         ` : ''}
 
@@ -72,30 +78,35 @@ const sendPaperSubmissionEmail = async (submission) => {
     subject: `Paper Submission Received — TECH FEST '26 (${submission.paperTitle || submission.topic})`,
     html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #E5E5E5; border-radius: 10px;">
-        <h2 style="color: #C40001; margin-top: 0;">Paper Submission Received!</h2>
+        <h2 style="color: #C40001; margin-top: 0;">Paper Submission Confirmed!</h2>
         <p>Dear <strong>${submission.name}</strong>,</p>
         <p>Thank you for submitting your paper for <strong>TECH FEST '26 — Paper Presentation</strong>. We have successfully received your submission details.</p>
 
         <div style="background-color: #fafafa; padding: 15px; border-radius: 8px; border: 1px solid #E5E5E5; margin-bottom: 20px;">
           <h4 style="margin-top: 0; color: #222222;">Submission Details:</h4>
+          ${submission.registrationId ? `<p style="margin-bottom: 5px; color: #555555;"><strong>Registration ID:</strong> <span style="font-family: monospace; font-weight: bold; color: #C40001;">${submission.registrationId}</span></p>` : ''}
           <p style="margin-bottom: 5px; color: #555555;"><strong>Paper Topic / Title:</strong> ${submission.paperTitle || submission.topic}</p>
           ${submission.teamName ? `<p style="margin-bottom: 5px; color: #555555;"><strong>Team Name:</strong> ${submission.teamName} ${submission.teamCode ? `(${submission.teamCode})` : ''}</p>` : ''}
           <p style="margin-bottom: 5px; color: #555555;"><strong>Submitted By:</strong> ${submission.name} (${submission.email})</p>
           <p style="margin-bottom: 5px; color: #555555;"><strong>College:</strong> ${submission.college} ${submission.department ? `· ${submission.department}` : ''}</p>
-          ${submission.driveUrl ? `<p style="margin-bottom: 5px; color: #555555;"><strong>Google Drive Link:</strong> <a href="${submission.driveUrl}" target="_blank" style="color: #C40001;">${submission.driveUrl}</a></p>` : ''}
+          ${submission.driveUrl ? `<p style="margin-bottom: 5px; color: #555555;"><strong>Provided Drive Link:</strong> <a href="${submission.driveUrl}" target="_blank" style="color: #C40001;">${submission.driveUrl}</a></p>` : ''}
           ${submission.fileName ? `<p style="margin-bottom: 5px; color: #555555;"><strong>Uploaded Document:</strong> ${submission.fileName}</p>` : ''}
-          <p style="margin-bottom: 0; color: #555555;"><strong>Submitted At:</strong> ${new Date(submission.submittedAt || Date.now()).toLocaleString('en-IN')}</p>
+          <p style="margin-bottom: 0; color: #555555;"><strong>Submission Timestamp:</strong> ${new Date(submission.submittedAt || Date.now()).toLocaleString('en-IN')}</p>
         </div>
 
-        <div style="background-color: #fff0f0; padding: 15px; border-radius: 8px; border: 1px solid #ffc1c1; margin-bottom: 20px;">
-          <h4 style="margin-top: 0; color: #C40001;">📋 Important Presentation Guidelines</h4>
-          <p style="color: #555555; font-size: 13px; margin-bottom: 8px;">• A maximum of 7 shortlisted teams/participants will be invited to present their paper on event day.</p>
-          <p style="color: #555555; font-size: 13px; margin-bottom: 8px;">• Each presentation consists of a 3-minute presentation followed by judge evaluation & Q&A.</p>
-          <p style="color: #555555; font-size: 13px; margin-bottom: 12px;">• You can also upload or update your presentation slides in the official Google Drive folder:</p>
-          <a href="https://drive.google.com/drive/folders/14Gj5s7asChOCzOuOoHwU05oFxZaxgi-k" target="_blank" style="display: inline-block; padding: 10px 20px; background-color: #C40001; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 13px;">Open Official Google Drive Folder</a>
+        <div style="background-color: #fff0f0; padding: 16px; border-radius: 8px; border: 1px solid #ffc1c1; margin-bottom: 20px;">
+          <h4 style="margin-top: 0; color: #C40001; font-size: 15px;">📋 Paper Presentation Guidelines</h4>
+          <ul style="padding-left: 20px; color: #444444; font-size: 13px; line-height: 1.6; margin-bottom: 0;">
+            <li style="margin-bottom: 6px;">Each participant/team will be given 10 minutes to present their paper.</li>
+            <li style="margin-bottom: 6px;">The presentation will be followed by a Q&A session with the judges.</li>
+            <li style="margin-bottom: 6px;">Participants should clearly explain the problem statement, proposed solution, methodology, results, and conclusion.</li>
+            <li style="margin-bottom: 6px;">Presentation slides should be clear, concise, and relevant to the submitted paper.</li>
+            <li style="margin-bottom: 6px;">Participants may upload or update their presentation slides before the submission deadline.</li>
+            <li style="margin-bottom: 0;">The presentation should be delivered by the registered participant/team members.</li>
+          </ul>
         </div>
 
-        <p style="color: #555555; font-size: 14px;">Shortlisted candidates will be notified via email prior to the event.</p>
+        <p style="color: #555555; font-size: 13px;">If you need to update your paper details or re-upload presentation slides before the deadline, you can visit the Paper Submission page and enter your Registration ID.</p>
         <br />
         <p style="color: #555555; font-size: 13px;">Best regards,<br/><strong>TECH FEST '26 Organizing Committee</strong><br/>V V College of Engineering</p>
       </div>

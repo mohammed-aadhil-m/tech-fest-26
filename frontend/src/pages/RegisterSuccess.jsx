@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Download, CheckCircle, Home, QrCode, Fingerprint, ShieldCheck, Users, Copy } from 'lucide-react';
+import { Download, CheckCircle, Home, QrCode, Fingerprint, ShieldCheck, Users, Copy, FileText } from 'lucide-react';
 import api from '../services/api';
 import { useToast } from '../context/ToastContext';
 import { PageLoader } from '../components/LoadingSpinner';
@@ -235,6 +235,27 @@ export default function RegisterSuccess() {
               </div>
             </div>
           </div>
+
+          {/* Paper Presentation Prompt */}
+          {registrations.some(r => r.event?.slug === 'paper-presentation' || r.eventName?.toLowerCase().includes('paper')) && (
+            <div className="mb-4 rounded-xl p-5 bg-gradient-to-r from-red-600/20 to-orange-600/10 border border-red-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center flex-shrink-0 text-red-400">
+                  <FileText size={20} />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-white mb-0.5">Paper Presentation Registered!</p>
+                  <p className="text-xs text-gray-300">Submit your research abstract & presentation slides online.</p>
+                </div>
+              </div>
+              <Link
+                to={`/submit-paper?regId=${registrationId}`}
+                className="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-bold uppercase tracking-wider transition-all text-center flex-shrink-0 shadow-[0_0_15px_rgba(220,38,38,0.4)]"
+              >
+                Submit Paper Now
+              </Link>
+            </div>
+          )}
 
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-4">

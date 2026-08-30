@@ -16,21 +16,30 @@ const events = [
     category: "technical",
     order: 1,
     description:
-      "We are excited to invite students to participate in the Paper Presentation event at our college. This is a great opportunity to present innovative ideas, research, technical knowledge, and creative solutions in your field of interest.",
+      "Present your innovative ideas, research, technical knowledge, and creative solutions. Each participant/team gets 10 minutes for presentation followed by judge Q&A.",
     fullDescription:
-      "Participants are requested to submit their paper before the deadline. Selected participants will get the opportunity to present their papers in the event.",
+      "Participants are requested to submit their paper presentation slides and abstract before the deadline (04/09/2026). Each participant/team will be given 10 minutes to present their paper, followed by a Q&A session with the judges. Participants should clearly explain the problem statement, proposed solution, methodology, results, and conclusion.",
     rules: [
-      "Submit your paper before the deadline: 04/09/2026.",
-      "Submission email: techfest.official2026@gmail.com",
+      "Each participant/team will be given 10 minutes to present their paper.",
+      "The presentation will be followed by a Q&A session with the judges.",
+      "Participants should clearly explain the problem statement, proposed solution, methodology, results, and conclusion.",
+      "Presentation slides should be clear, concise, and relevant to the submitted paper.",
+      "Participants may upload or update their presentation slides before the submission deadline (04/09/2026).",
+      "The presentation should be delivered by the registered participant/team members.",
       "Ensure your paper is original and plagiarism-free.",
-      "The paper must follow the prescribed format.",
-      "Selected participants will be notified via email.",
-      "Participants must be present for the presentation on the event day.",
-      "Any form of malpractice will lead to disqualification.",
+      "Any form of malpractice will lead to immediate disqualification."
+    ],
+    evaluationCriteria: [
+      { title: "Presentation & Timing", description: "Clarity of delivery within the allotted 10 minutes." },
+      { title: "Problem & Solution", description: "Depth of problem statement and proposed methodology." },
+      { title: "Judge Q&A", description: "Confidence and accuracy during the interactive Q&A session." },
+      { title: "Innovation & Relevance", description: "Originality and practical relevance of the research paper." }
     ],
     tagline: "Submit your ideas. Share your knowledge. Inspire others! 🚀",
     submissionEmail: "techfest.official2026@gmail.com",
     submissionDeadline: new Date("2026-09-04"),
+    time: "10:30 AM - 12:30 PM",
+    venue: "CSE Seminar Hall",
     isTeamEvent: true,
     maxTeamSize: 3,
     minTeamSize: 1,

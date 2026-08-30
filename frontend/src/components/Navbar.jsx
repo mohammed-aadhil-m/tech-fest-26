@@ -7,6 +7,7 @@ const navLinks = [
   { label: 'About', to: '/#about' },
   { label: 'Schedule', to: '/#schedule' },
   { label: 'Events', to: '/events' },
+  { label: 'Paper Submission', to: '/submit-paper' },
   { label: 'Contact', to: '/contact' },
 ];
 

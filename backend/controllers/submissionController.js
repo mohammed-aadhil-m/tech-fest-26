@@ -1,14 +1,268 @@
 const Submission = require('../models/Submission');
 const Team = require('../models/Team');
 const User = require('../models/User');
+const Event = require('../models/Event');
+const EventRegistration = require('../models/EventRegistration');
 const { sendPaperSubmissionEmail } = require('../utils/emailSender');
 const XLSX = require('xlsx');
 const path = require('path');
+
+// GET /api/submissions/verify/:regId (or /verify-eligibility)
+exports.verifyEligibility = async (req, res, next) => {
+  try {
+    const rawId = (req.params.regId || req.query.id || req.body?.registrationId || '').trim();
+    if (!rawId) {
+      return res.status(400).json({
+        success: false,
+        eligible: false,
+        message: 'Please provide your Registration ID.'
+      });
+    }
+
+    const regIdRegex = new RegExp(`^${rawId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
+
+    // 1. Find the Paper Presentation event
+    const paperEvent = await Event.findOne({ slug: 'paper-presentation' });
+    if (!paperEvent) {
+      return res.status(500).json({ success: false, message: 'Paper presentation event is not configured.' });
+    }
+
+    // 2. Find EventRegistration by registrationId
+    let eventReg = await EventRegistration.findOne({ registrationId: regIdRegex })
+      .populate('user')
+      .populate({
+        path: 'team',
+        populate: { path: 'leader members', select: 'fullName email mobile college department year' }
+      })
+      .populate('event');
+
+    let user = eventReg?.user;
+
+    // If not found by registrationId directly, check if rawId is an email or mobile
+    if (!eventReg) {
+      const foundUser = await User.findOne({
+        $or: [
+          { email: rawId.toLowerCase() },
+          { mobile: rawId }
+        ]
+      });
+
+      if (foundUser) {
+        user = foundUser;
+        // Find paper presentation registration for this user
+        eventReg = await EventRegistration.findOne({
+          user: user._id,
+          event: paperEvent._id,
+          status: { $ne: 'cancelled' }
+        })
+          .populate('user')
+          .populate({
+            path: 'team',
+            populate: { path: 'leader members', select: 'fullName email mobile college department year' }
+          })
+          .populate('event');
+      }
+    }
+
+    // 3. Also check legacy Registration collection if still not found
+    if (!eventReg && !user) {
+      try {
+        const Registration = require('../models/Registration');
+        const legacyReg = await Registration.findOne({
+          $or: [
+            { registrationId: regIdRegex },
+            { email: rawId.toLowerCase() },
+            { mobile: rawId }
+          ]
+        });
+
+        if (legacyReg) {
+          const hasPaperEvent = legacyReg.events?.some(e => e.eventSlug === 'paper-presentation' || (e.eventName && e.eventName.toLowerCase().includes('paper')));
+          if (!hasPaperEvent) {
+            return res.status(200).json({
+              success: true,
+              eligible: false,
+              reason: 'NOT_REGISTERED_FOR_EVENT',
+              participantName: legacyReg.fullName,
+              registeredEvents: legacyReg.events?.map(e => e.eventName).filter(Boolean) || [],
+              message: `You are registered for TECH FEST '26 (ID: ${legacyReg.registrationId}), but you have NOT registered for the Paper Presentation event. Only participants registered for Paper Presentation can submit a paper.`
+            });
+          }
+
+          // Check if paper already submitted
+          const existingSub = await Submission.findOne({
+            $or: [
+              { email: legacyReg.email.toLowerCase() },
+              { registrationId: legacyReg.registrationId.toUpperCase() }
+            ]
+          });
+
+          if (existingSub) {
+            return res.json({
+              success: true,
+              eligible: true,
+              alreadySubmitted: true,
+              submission: existingSub,
+              message: `A paper titled "${existingSub.paperTitle}" has already been submitted for this registration.`
+            });
+          }
+
+          return res.json({
+            success: true,
+            eligible: true,
+            alreadySubmitted: false,
+            registrationId: legacyReg.registrationId,
+            participant: {
+              name: legacyReg.fullName,
+              email: legacyReg.email,
+              mobile: legacyReg.mobile,
+              college: legacyReg.college,
+              department: legacyReg.department,
+              year: legacyReg.year
+            },
+            team: null
+          });
+        }
+      } catch (err) {
+        // legacy ignore
+      }
+    }
+
+    // If user is found, check if they are registered for Paper Presentation
+    if (user && !eventReg) {
+      // Find all events this user registered for
+      const allUserRegs = await EventRegistration.find({ user: user._id, status: { $ne: 'cancelled' } }).populate('event');
+      const registeredEventNames = allUserRegs.map(r => r.event?.name).filter(Boolean);
+      const isRegisteredForPaper = allUserRegs.some(r => r.event?.slug === 'paper-presentation' || r.event?._id?.toString() === paperEvent._id.toString());
+
+      if (!isRegisteredForPaper) {
+        return res.status(200).json({
+          success: true,
+          eligible: false,
+          reason: 'NOT_REGISTERED_FOR_EVENT',
+          participantName: user.fullName,
+          registeredEvents: registeredEventNames,
+          message: `Hello ${user.fullName}, you are registered for TECH FEST '26 (${registeredEventNames.join(', ')}), but you have NOT registered for the Paper Presentation event. Only participants registered for Paper Presentation can submit a paper.`
+        });
+      }
+
+      eventReg = allUserRegs.find(r => r.event?.slug === 'paper-presentation' || r.event?._id?.toString() === paperEvent._id.toString());
+    }
+
+    if (!eventReg) {
+      return res.status(404).json({
+        success: false,
+        eligible: false,
+        reason: 'REGISTRATION_NOT_FOUND',
+        message: `Registration ID "${rawId}" was not found. Please verify your Registration ID or register for the event first.`
+      });
+    }
+
+    // Check if the event registration is for paper presentation
+    const isPaperEvent = eventReg.event?.slug === 'paper-presentation' || eventReg.event?._id?.toString() === paperEvent._id.toString();
+    if (!isPaperEvent) {
+      // Find all other event registrations for this user
+      const otherRegs = await EventRegistration.find({ user: eventReg.user._id, status: { $ne: 'cancelled' } }).populate('event');
+      const paperReg = otherRegs.find(r => r.event?.slug === 'paper-presentation' || r.event?._id?.toString() === paperEvent._id.toString());
+
+      if (!paperReg) {
+        const registeredEventNames = otherRegs.map(r => r.event?.name).filter(Boolean);
+        return res.status(200).json({
+          success: true,
+          eligible: false,
+          reason: 'NOT_REGISTERED_FOR_EVENT',
+          participantName: eventReg.user?.fullName,
+          registeredEvents: registeredEventNames,
+          message: `Registration ID ${rawId} belongs to ${eventReg.user?.fullName} for "${eventReg.event?.name}", but you have NOT registered for the Paper Presentation event. Only participants registered for Paper Presentation can submit a paper.`
+        });
+      }
+
+      eventReg = paperReg;
+    }
+
+    // If we have verified paper registration:
+    const team = eventReg.team;
+    const participantUser = eventReg.user;
+
+    // Check if a paper has already been submitted for this user / team
+    const checkEmails = [participantUser.email.toLowerCase()];
+    if (team) {
+      if (team.leader?.email) checkEmails.push(team.leader.email.toLowerCase());
+      if (Array.isArray(team.members)) {
+        team.members.forEach(m => {
+          if (m.email) checkEmails.push(m.email.toLowerCase());
+        });
+      }
+    }
+
+    const queryOr = [
+      { email: { $in: checkEmails } },
+      { registrationId: eventReg.registrationId.toUpperCase() }
+    ];
+    if (team?.teamCode) {
+      queryOr.push({ teamCode: team.teamCode.toUpperCase() });
+    }
+
+    const existingSubmission = await Submission.findOne({ $or: queryOr });
+
+    if (existingSubmission) {
+      return res.json({
+        success: true,
+        eligible: true,
+        alreadySubmitted: true,
+        canUpdate: true,
+        registrationId: eventReg.registrationId,
+        submission: existingSubmission,
+        participant: {
+          name: participantUser.fullName,
+          email: participantUser.email,
+          mobile: participantUser.mobile,
+          college: participantUser.college,
+          department: participantUser.department,
+          year: participantUser.year
+        },
+        team: team ? {
+          teamName: team.teamName,
+          teamCode: team.teamCode,
+          leader: team.leader ? { name: team.leader.fullName, email: team.leader.email } : null,
+          members: Array.isArray(team.members) ? team.members.map(m => ({ name: m.fullName, email: m.email })) : []
+        } : null,
+        message: `A paper titled "${existingSubmission.paperTitle}" has already been submitted for this registration. You may update your paper presentation details or re-upload slides before the deadline (04/09/2026).`
+      });
+    }
+
+    return res.json({
+      success: true,
+      eligible: true,
+      alreadySubmitted: false,
+      registrationId: eventReg.registrationId,
+      participant: {
+        name: participantUser.fullName,
+        email: participantUser.email,
+        mobile: participantUser.mobile,
+        college: participantUser.college,
+        department: participantUser.department,
+        year: participantUser.year
+      },
+      team: team ? {
+        teamName: team.teamName,
+        teamCode: team.teamCode,
+        leader: team.leader ? { name: team.leader.fullName, email: team.leader.email } : null,
+        members: Array.isArray(team.members) ? team.members.map(m => ({ name: m.fullName, email: m.email })) : []
+      } : null
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
 // POST /api/submissions
 exports.createSubmission = async (req, res, next) => {
   try {
     const {
+      submissionId,
+      isUpdate,
+      registrationId,
       name, email, mobile, college, department, year,
       paperTitle, topic, abstract, teamName, teamCode, driveUrl
     } = req.body;
@@ -31,17 +285,69 @@ exports.createSubmission = async (req, res, next) => {
       });
     }
 
-    // Check duplicate submissions: "more than one paper from same team is not allowed"
     const normalizedEmail = email.trim().toLowerCase();
     const normalizedTeamCode = teamCode ? teamCode.trim().toUpperCase() : null;
     const normalizedTeamName = teamName ? teamName.trim() : null;
+    const normalizedRegId = registrationId ? registrationId.trim().toUpperCase() : null;
 
-    // 1. Check if email already submitted
-    const existingByEmail = await Submission.findOne({ email: normalizedEmail });
-    if (existingByEmail) {
+    // ── Check if this is an UPDATE request ─────────────────
+    if (isUpdate === true || isUpdate === 'true' || submissionId) {
+      let existingSub = null;
+      if (submissionId) {
+        existingSub = await Submission.findById(submissionId);
+      }
+      if (!existingSub && normalizedRegId) {
+        existingSub = await Submission.findOne({ registrationId: normalizedRegId });
+      }
+      if (!existingSub && normalizedEmail) {
+        existingSub = await Submission.findOne({ email: normalizedEmail });
+      }
+
+      if (existingSub) {
+        existingSub.paperTitle = finalTitle.trim();
+        existingSub.topic = finalTitle.trim();
+        existingSub.abstract = abstract.trim();
+        if (driveUrl !== undefined) existingSub.driveUrl = driveUrl.trim();
+        if (mobile) existingSub.mobile = mobile.trim();
+        if (department) existingSub.department = department.trim();
+        if (year) existingSub.year = year;
+        if (normalizedTeamName) existingSub.teamName = normalizedTeamName;
+        if (normalizedTeamCode) existingSub.teamCode = normalizedTeamCode;
+        if (normalizedRegId) existingSub.registrationId = normalizedRegId;
+
+        if (req.file) {
+          existingSub.fileUrl = `/uploads/papers/${req.file.filename}`;
+          existingSub.fileName = req.file.originalname;
+        }
+
+        existingSub.submittedAt = Date.now();
+        await existingSub.save();
+
+        sendPaperSubmissionEmail(existingSub).catch(err => console.error('Email error:', err));
+
+        return res.status(200).json({
+          success: true,
+          message: 'Paper submission updated successfully! A confirmation email has been sent.',
+          data: existingSub,
+          updated: true
+        });
+      }
+    }
+
+    // ── Otherwise: CREATE FLOW (Check for duplicates) ──────
+    // 1. Check if email or regId already submitted
+    const existingByEmailOrReg = await Submission.findOne({
+      $or: [
+        { email: normalizedEmail },
+        ...(normalizedRegId ? [{ registrationId: normalizedRegId }] : [])
+      ]
+    });
+    if (existingByEmailOrReg) {
       return res.status(400).json({
         success: false,
-        message: `A paper titled "${existingByEmail.paperTitle}" has already been submitted using this email (${normalizedEmail}). Only one paper submission per participant/team is allowed.`
+        alreadySubmitted: true,
+        submissionId: existingByEmailOrReg._id,
+        message: `A paper titled "${existingByEmailOrReg.paperTitle}" has already been submitted (${normalizedEmail}). You can choose to update your existing paper before the deadline.`
       });
     }
 
@@ -51,7 +357,9 @@ exports.createSubmission = async (req, res, next) => {
       if (existingByTeamCode) {
         return res.status(400).json({
           success: false,
-          message: `A paper titled "${existingByTeamCode.paperTitle}" has already been submitted for Team Code "${normalizedTeamCode}" by ${existingByTeamCode.name}. Only one paper submission per team is allowed.`
+          alreadySubmitted: true,
+          submissionId: existingByTeamCode._id,
+          message: `A paper titled "${existingByTeamCode.paperTitle}" has already been submitted for Team Code "${normalizedTeamCode}". You can update the submission before the deadline.`
         });
       }
 
@@ -67,7 +375,9 @@ exports.createSubmission = async (req, res, next) => {
         if (existingByTeamMember) {
           return res.status(400).json({
             success: false,
-            message: `A team member (${existingByTeamMember.name}) from team "${registeredTeam.teamName}" has already submitted a paper titled "${existingByTeamMember.paperTitle}". Only one paper submission per team is allowed.`
+            alreadySubmitted: true,
+            submissionId: existingByTeamMember._id,
+            message: `A team member (${existingByTeamMember.name}) from team "${registeredTeam.teamName}" has already submitted a paper titled "${existingByTeamMember.paperTitle}". You can update the submission before the deadline.`
           });
         }
       }
@@ -81,12 +391,15 @@ exports.createSubmission = async (req, res, next) => {
       if (existingByTeamName) {
         return res.status(400).json({
           success: false,
-          message: `A paper titled "${existingByTeamName.paperTitle}" has already been submitted for team "${normalizedTeamName}" by ${existingByTeamName.name}. Only one paper submission per team is allowed.`
+          alreadySubmitted: true,
+          submissionId: existingByTeamName._id,
+          message: `A paper titled "${existingByTeamName.paperTitle}" has already been submitted for team "${normalizedTeamName}". You can update the submission before the deadline.`
         });
       }
     }
 
     const submissionData = {
+      registrationId: normalizedRegId || '',
       name: name.trim(),
       email: normalizedEmail,
       mobile: mobile ? mobile.trim() : '',

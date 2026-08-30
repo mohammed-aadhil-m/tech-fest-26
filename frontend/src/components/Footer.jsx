@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { MapPin } from 'lucide-react';
+import { MapPin, Mail } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -30,10 +30,16 @@ export default function Footer() {
               The ultimate technical symposium organized by the Department of Computer Science and Engineering,
               V V College of Engineering. Join us to decode the future.
             </p>
-            <Link to="/contact" className="flex items-start gap-3 text-sm text-gray-400 p-4 rounded-xl bg-white/5 border border-white/5 max-w-md hover:bg-white/10 hover:border-red-500/30 transition-all duration-300 group cursor-pointer">
-              <MapPin size={18} className="mt-0.5 flex-shrink-0 text-red-500 group-hover:text-red-400" />
-              <p className="leading-relaxed group-hover:text-white transition-colors">V V Nagar, Arasoor, Thisayanvilai,<br />Sathankulam Taluk, Tuticorin District - 628 656</p>
-            </Link>
+            <div className="space-y-3 max-w-md">
+              <Link to="/contact" className="flex items-start gap-3 text-sm text-gray-400 p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-red-500/30 transition-all duration-300 group cursor-pointer">
+                <MapPin size={18} className="mt-0.5 flex-shrink-0 text-red-500 group-hover:text-red-400" />
+                <p className="leading-relaxed group-hover:text-white transition-colors">V V Nagar, Arasoor, Thisayanvilai,<br />Sathankulam Taluk, Tuticorin District - 628 656</p>
+              </Link>
+              <a href="mailto:techfest.official2026@gmail.com" className="flex items-center gap-3 text-sm text-gray-400 p-3.5 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-red-500/30 transition-all duration-300 group">
+                <Mail size={16} className="flex-shrink-0 text-red-500 group-hover:text-red-400" />
+                <span className="font-mono text-xs group-hover:text-white transition-colors">techfest.official2026@gmail.com</span>
+              </a>
+            </div>
           </div>
 
           {/* Events */}

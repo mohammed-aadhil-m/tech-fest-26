@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const submissionSchema = new mongoose.Schema({
   // Submitter / Author details
+  registrationId: { type: String, uppercase: true, trim: true },
   name: { type: String, required: true, trim: true },
   email: { type: String, required: true, lowercase: true, trim: true },
   mobile: { type: String, trim: true },

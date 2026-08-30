@@ -61,6 +61,7 @@ export default function App() {
             <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
             <Route path="/winners" element={<PublicLayout><Winners /></PublicLayout>} />
             <Route path="/submit-paper" element={<PublicLayout><PaperSubmission /></PublicLayout>} />
+            <Route path="/paper-submission" element={<PublicLayout><PaperSubmission /></PublicLayout>} />
 
             {/* Redirect old gallery/rules routes to home */}
             <Route path="/gallery" element={<Navigate to="/" replace />} />
