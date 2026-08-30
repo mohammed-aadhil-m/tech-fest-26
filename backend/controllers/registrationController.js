@@ -221,25 +221,59 @@ exports.createRegistration = async (req, res, next) => {
 // GET /api/registrations/:registrationId (public)
 exports.getRegistrationByRegId = async (req, res, next) => {
   try {
-    const reg = await EventRegistration.findOne({ registrationId: req.params.registrationId })
+    const rawId = (req.params.registrationId || '').trim();
+    const reg = await EventRegistration.findOne({ registrationId: new RegExp(`^${rawId}$`, 'i') })
       .populate('event', 'name slug icon category')
       .populate('user')
       .populate({
         path: 'team',
-        populate: { path: 'leader members', select: 'fullName' }
+        populate: { path: 'leader members', select: 'fullName email' }
       });
       
-    if (!reg) return res.status(404).json({ success: false, message: 'Registration not found.' });
+    if (!reg) {
+      // Check legacy Registration collection if needed
+      try {
+        const Registration = require('../models/Registration');
+        const legacyReg = await Registration.findOne({ registrationId: new RegExp(`^${rawId}$`, 'i') });
+        if (legacyReg) {
+          const eventsList = (legacyReg.events || []).map(ev => ({
+            registrationId: legacyReg.registrationId,
+            user: {
+              fullName: legacyReg.fullName,
+              email: legacyReg.email,
+              mobile: legacyReg.mobile,
+              college: legacyReg.college,
+              department: legacyReg.department,
+              year: legacyReg.year,
+              foodPreference: legacyReg.foodPreference
+            },
+            event: {
+              name: ev.eventName || 'Registered Event',
+              slug: ev.eventSlug || 'event',
+              icon: '🎯'
+            },
+            registrationType: legacyReg.registrationType || 'INDIVIDUAL',
+            status: legacyReg.status || 'confirmed'
+          }));
+          return res.json({ success: true, data: eventsList });
+        }
+      } catch (e) {}
 
-    // Since we now have multiple registrations per user session, let's also fetch all other registrations for this user 
-    const allUserRegs = await EventRegistration.find({ user: reg.user._id })
+      return res.status(404).json({ success: false, message: 'Registration not found.' });
+    }
+
+    const targetUserId = reg.user?._id || reg.user;
+
+    // Fetch all user registrations with user, event, and team populated
+    const allUserRegs = await EventRegistration.find({ user: targetUserId })
       .populate('event', 'name slug icon category')
+      .populate('user')
       .populate({
         path: 'team',
-        populate: { path: 'leader members', select: 'fullName' }
+        populate: { path: 'leader members', select: 'fullName email' }
       });
 
-    res.json({ success: true, data: allUserRegs }); // returning array instead of single reg
+    res.json({ success: true, data: allUserRegs });
   } catch (err) { next(err); }
 };
 

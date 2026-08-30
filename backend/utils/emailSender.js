@@ -38,10 +38,19 @@ const sendRegistrationEmail = async (userEmail, userName, registrationId, regist
           </ul>
         </div>
 
-        ${registeredEvents.some(e => e.eventName && (e.eventName.toLowerCase().includes('paper presentation') || (e.eventSlug && e.eventSlug === 'paper-presentation'))) ? `
-        <div style="background-color: #fff0f0; padding: 16px; border-radius: 8px; border: 1px solid #ffc1c1; margin-bottom: 20px;">
-          <h4 style="margin-top: 0; color: #C40001; font-size: 15px;">📄 Paper Presentation Guidelines</h4>
-          <ul style="padding-left: 20px; color: #444444; font-size: 13px; line-height: 1.6; margin-bottom: 12px;">
+        ${registeredEvents.some(e => e.eventName && (e.eventName.toLowerCase().includes('paper') || (e.eventSlug && e.eventSlug.includes('paper')))) ? `
+        <div style="background-color: #fff0f0; padding: 18px; border-radius: 8px; border: 1px solid #ffc1c1; margin-bottom: 20px;">
+          <h3 style="margin-top: 0; color: #C40001; font-size: 16px; margin-bottom: 8px;">📢 You Are Registered for Paper Presentation!</h3>
+          <p style="color: #333333; font-size: 13px; margin-bottom: 12px; line-height: 1.5;">
+            You can upload or update your presentation slides and research abstract directly on our official website using your Registration ID: <strong style="color: #C40001; font-family: monospace;">${registrationId}</strong>.
+          </p>
+          <div style="margin-bottom: 15px;">
+            <p style="margin: 0; font-size: 13px; color: #555555;">
+              <strong>Upload Paper Online:</strong> <a href="https://techfest26.com/submit-paper?regId=${registrationId}" style="color: #C40001; font-weight: bold; text-decoration: underline;">Visit Paper Submission Portal (submit-paper)</a>
+            </p>
+          </div>
+          <h4 style="margin-top: 10px; margin-bottom: 8px; color: #C40001; font-size: 14px;">📋 Rules & Guidelines:</h4>
+          <ul style="padding-left: 20px; color: #444444; font-size: 13px; line-height: 1.6; margin-bottom: 0;">
             <li style="margin-bottom: 6px;">Each participant/team will be given 10 minutes to present their paper.</li>
             <li style="margin-bottom: 6px;">The presentation will be followed by a Q&A session with the judges.</li>
             <li style="margin-bottom: 6px;">Participants should clearly explain the problem statement, proposed solution, methodology, results, and conclusion.</li>
