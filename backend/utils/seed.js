@@ -323,6 +323,21 @@ const defaultSettings = [
     value: true,
     label: "Global Registration Open/Close",
   },
+  {
+    key: "upiId",
+    value: "aadhilaadhil8851-2@okicici",
+    label: "UPI Payment ID / VPA",
+  },
+  {
+    key: "upiPayeeName",
+    value: "Mohammed Aadhil M",
+    label: "UPI Payee / Account Name",
+  },
+  {
+    key: "registrationFee",
+    value: "250",
+    label: "Registration Fee per Participant (₹)",
+  },
 ];
 
 const seed = async () => {
