@@ -10,6 +10,15 @@ import Modal from '../../components/Modal';
 const STATUS_OPTIONS = ['registered', 'confirmed', 'attended', 'disqualified', 'cancelled'];
 const PAYMENT_STATUS_OPTIONS = ['unpaid', 'pending', 'paid', 'rejected'];
 
+const formatImageUrl = (url) => {
+  if (!url) return '';
+  const clean = url.replace(/\\/g, '/');
+  if (clean.startsWith('http://') || clean.startsWith('https://') || clean.startsWith('data:')) {
+    return clean;
+  }
+  return clean.startsWith('/') ? clean : `/${clean}`;
+};
+
 export default function AdminRegistrations() {
   const toast = useToast();
   const [registrations, setRegistrations] = useState([]);
@@ -466,13 +475,13 @@ export default function AdminRegistrations() {
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
-                          onClick={() => setPreviewScreenshot(paymentDetails.screenshotUrl)}
+                          onClick={() => setPreviewScreenshot(formatImageUrl(paymentDetails.screenshotUrl))}
                           className="px-3 py-1 bg-white/5 hover:bg-white/15 text-white border border-white/10 rounded-lg text-xs font-bold tracking-wider flex items-center gap-1.5 transition-all"
                         >
                           <Maximize2 size={13} /> Zoom / Fullscreen
                         </button>
                         <a
-                          href={paymentDetails.screenshotUrl}
+                          href={formatImageUrl(paymentDetails.screenshotUrl)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="px-3 py-1 bg-white/5 hover:bg-white/15 text-gray-300 hover:text-white border border-white/10 rounded-lg text-xs font-bold tracking-wider flex items-center gap-1.5 transition-all"
@@ -483,11 +492,11 @@ export default function AdminRegistrations() {
                     </div>
 
                     <div
-                      onClick={() => setPreviewScreenshot(paymentDetails.screenshotUrl)}
+                      onClick={() => setPreviewScreenshot(formatImageUrl(paymentDetails.screenshotUrl))}
                       className="group relative cursor-zoom-in rounded-xl overflow-hidden border border-white/10 hover:border-red-500/50 transition-all bg-black/80 max-w-sm"
                     >
                       <img
-                        src={paymentDetails.screenshotUrl}
+                        src={formatImageUrl(paymentDetails.screenshotUrl)}
                         alt="Payment Screenshot"
                         className="w-full h-auto max-h-72 object-contain group-hover:scale-102 transition-transform duration-300"
                         onError={(e) => {

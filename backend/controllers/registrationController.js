@@ -3,6 +3,7 @@ const Team = require('../models/Team');
 const EventRegistration = require('../models/EventRegistration');
 const Event = require('../models/Event');
 const Payment = require('../models/Payment');
+const Submission = require('../models/Submission');
 const { generateUniqueRegistrationId } = require('../utils/idGenerator');
 const { registrationsToCSV } = require('../utils/csvExporter');
 const { registrationsToExcel } = require('../utils/excelExporter');
@@ -354,19 +355,40 @@ exports.exportCSV = async (req, res, next) => {
 // ADMIN: GET /api/admin/stats
 exports.getStats = async (req, res, next) => {
   try {
-    const total = await EventRegistration.countDocuments();
-    const User = require('../models/User');
+    const totalRegistrations = await EventRegistration.countDocuments();
     const totalUsers = await User.countDocuments();
-    const Team = require('../models/Team');
     const totalTeams = await Team.countDocuments();
-    
-    res.json({ 
-      success: true, 
-      data: { 
-        totalRegistrations: total, 
-        totalUsers, 
-        totalTeams 
-      } 
+    const submissions = await Submission.countDocuments();
+
+    // Registrations count by event
+    const events = await Event.find({ active: true }).sort({ order: 1 });
+    const counts = await EventRegistration.aggregate([
+      { $group: { _id: '$event', count: { $sum: 1 } } }
+    ]);
+    const countMap = new Map(counts.map(c => [c._id ? c._id.toString() : '', c.count]));
+
+    const byEvent = events.map(e => ({
+      _id: e.name,
+      count: countMap.get(e._id.toString()) || 0
+    }));
+
+    // Recent registrations with user and event populated
+    const recent = await EventRegistration.find()
+      .populate('user', 'fullName email mobile college department year')
+      .populate('event', 'name slug icon category')
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    res.json({
+      success: true,
+      data: {
+        totalRegistrations,
+        totalUsers,
+        totalTeams,
+        submissions,
+        byEvent,
+        recent
+      }
     });
   } catch (err) { next(err); }
 };

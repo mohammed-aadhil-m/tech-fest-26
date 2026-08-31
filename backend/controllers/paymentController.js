@@ -86,47 +86,53 @@ exports.getAllPayments = async (req, res, next) => {
     const filter = {};
     if (status) filter.status = status;
 
-    if (userId) {
-      // Find all registration IDs for this user
-      const userRegs = await EventRegistration.find({ user: userId }).select('registrationId');
-      const userRegIds = userRegs.map(r => r.registrationId);
-      if (registrationId && !userRegIds.includes(registrationId)) {
-        userRegIds.push(registrationId);
+    if (userId || registrationId) {
+      const matchConditions = [];
+
+      if (userId) {
+        matchConditions.push({ user: userId });
+        const userRegs = await EventRegistration.find({ user: userId }).select('registrationId');
+        const userRegIds = userRegs.map(r => r.registrationId).filter(Boolean);
+        if (userRegIds.length > 0) {
+          matchConditions.push({ registrationId: { $in: userRegIds } });
+          matchConditions.push({ registrationIds: { $in: userRegIds } });
+        }
       }
-      filter.$or = [
-        { user: userId },
-        { registrationId: { $in: userRegIds } },
-        { registrationIds: { $in: userRegIds } }
-      ];
-    } else if (registrationId) {
-      // Find user of this registrationId to match any associated payments
-      const targetReg = await EventRegistration.findOne({ registrationId });
-      if (targetReg && targetReg.user) {
-        const userRegs = await EventRegistration.find({ user: targetReg.user }).select('registrationId');
-        const userRegIds = userRegs.map(r => r.registrationId);
-        filter.$or = [
-          { registrationId: { $in: userRegIds } },
-          { registrationIds: { $in: userRegIds } },
-          { user: targetReg.user }
-        ];
-      } else {
-        filter.$or = [
-          { registrationId: registrationId },
-          { registrationIds: registrationId }
-        ];
+
+      if (registrationId) {
+        const cleanRegId = registrationId.trim();
+        const regRegex = new RegExp(`^${cleanRegId}$`, 'i');
+        matchConditions.push({ registrationId: regRegex });
+        matchConditions.push({ registrationIds: regRegex });
+
+        const targetReg = await EventRegistration.findOne({ registrationId: regRegex }).populate('user');
+        if (targetReg && targetReg.user) {
+          const targetUserId = targetReg.user._id || targetReg.user;
+          matchConditions.push({ user: targetUserId });
+          const userRegs = await EventRegistration.find({ user: targetUserId }).select('registrationId');
+          const userRegIds = userRegs.map(r => r.registrationId).filter(Boolean);
+          if (userRegIds.length > 0) {
+            matchConditions.push({ registrationId: { $in: userRegIds } });
+            matchConditions.push({ registrationIds: { $in: userRegIds } });
+          }
+        }
       }
+
+      filter.$or = matchConditions;
     } else if (search) {
+      const cleanSearch = search.trim();
+      const searchRegex = new RegExp(cleanSearch, 'i');
       const matchedUsers = await User.find({
         $or: [
-          { fullName: { $regex: search, $options: 'i' } },
-          { email: { $regex: search, $options: 'i' } },
-          { mobile: { $regex: search, $options: 'i' } }
+          { fullName: searchRegex },
+          { email: searchRegex },
+          { mobile: searchRegex }
         ]
       }).select('_id');
       
       const matchedRegs = await EventRegistration.find({
         $or: [
-          { registrationId: { $regex: search, $options: 'i' } },
+          { registrationId: searchRegex },
           { user: { $in: matchedUsers.map(u => u._id) } }
         ]
       }).select('registrationId user');
@@ -135,12 +141,12 @@ exports.getAllPayments = async (req, res, next) => {
       const userIds = matchedRegs.map(r => r.user).filter(Boolean);
 
       filter.$or = [
-        { registrationId: { $regex: search, $options: 'i' } },
+        { registrationId: searchRegex },
         { registrationId: { $in: regIds } },
         { registrationIds: { $in: regIds } },
-        { user: { $in: userIds } },
-        { transactionId: { $regex: search, $options: 'i' } },
-        { paymentPhone: { $regex: search, $options: 'i' } },
+        { user: { $in: [...userIds, ...matchedUsers.map(u => u._id)] } },
+        { transactionId: searchRegex },
+        { paymentPhone: searchRegex },
       ];
     }
 
