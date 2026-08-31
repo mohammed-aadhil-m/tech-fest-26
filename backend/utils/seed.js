@@ -1,5 +1,6 @@
 require("dotenv").config({ path: require("path").join(__dirname, "../.env") });
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 const Admin = require("../models/Admin");
 const Event = require("../models/Event");
 const Setting = require("../models/Setting");
@@ -325,13 +326,13 @@ const seed = async () => {
   console.log("Seeding database...");
 
   // Upsert admin user
+  const hashedPassword = await bcrypt.hash("techfest2026", 12);
   await Admin.findOneAndUpdate(
     { username: "admin" },
     {
       username: "admin",
       email: "admin@techfest26.vvcoe.edu.in",
-      passwordHash:
-        "$2a$10$f9n8g4P5mR9b0l1s8s7Zq.gX4vX9vQ5q6yG4s9l2vP0xZ1y3l5v5q", // hashed or hook
+      passwordHash: hashedPassword,
       role: "superadmin",
     },
     { upsert: true, new: true },
