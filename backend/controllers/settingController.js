@@ -3,7 +3,11 @@ const Setting = require('../models/Setting');
 // GET /api/settings (public - selected settings)
 exports.getPublicSettings = async (req, res, next) => {
   try {
-    const publicKeys = ['eventDate', 'registrationDeadline', 'contactEmail', 'contactPhone', 'mapEmbedUrl', 'instagramUrl', 'facebookUrl', 'youtubeUrl', 'twitterUrl', 'registrationOpen'];
+    const publicKeys = [
+      'eventDate', 'registrationDeadline', 'contactEmail', 'contactPhone',
+      'mapEmbedUrl', 'instagramUrl', 'facebookUrl', 'youtubeUrl', 'twitterUrl',
+      'registrationOpen', 'upiId', 'upiPayeeName', 'registrationFee'
+    ];
     const settings = await Setting.find({ key: { $in: publicKeys } });
     const result = {};
     settings.forEach(s => { result[s.key] = s.value; });

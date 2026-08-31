@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Upload, X, CreditCard, Phone, Hash, CheckCircle, Home, AlertCircle } from 'lucide-react';
@@ -7,15 +7,13 @@ import { useToast } from '../context/ToastContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { QRCodeSVG } from 'qrcode.react';
 
-// Replace this URL with your actual UPI/payment QR code image path or URL
-const QR_CODE_IMAGE = null; // Set to '/qr-payment.png' once you add the image to /public
-
 export default function Payment() {
   const { registrationId } = useParams();
   const navigate = useNavigate();
   const toast = useToast();
   const fileInputRef = useRef(null);
 
+  const [settings, setSettings] = useState({});
   const [form, setForm] = useState({
     transactionId: '',
     paymentPhone: '',
@@ -24,6 +22,16 @@ export default function Payment() {
   const [screenshotPreview, setScreenshotPreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    api.get('/settings')
+      .then(res => {
+        if (res.data.data) {
+          setSettings(res.data.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleChange = (field, value) => {
     setForm(f => ({ ...f, [field]: value }));
@@ -126,21 +134,32 @@ export default function Payment() {
               <CreditCard size={24} />
             </div>
             <h2 className="text-2xl font-display font-bold text-white mb-6">Scan & Pay with UPI</h2>
-            <div className="p-4 bg-white rounded-2xl shadow-[0_0_30px_rgba(255,42,42,0.15)] border border-red-500/20 flex flex-col items-center">
-              <QRCodeSVG
-                value="upi://pay?pa=aadhilaadhil8851-2@okicici&pn=Mohammed%20Aadhil%20M&am=250.00"
-                size={160}
-                level="M"
-                includeMargin={false}
-              />
-              <div className="mt-4 text-center">
-                <p className="text-xs text-gray-600 font-bold">UPI ID: aadhilaadhil8851-2@okicici</p>
-                <p className="text-xs text-gray-500 mt-1">Mohammed Aadhil M • ₹250.00</p>
-              </div>
-            </div>
-            <p className="text-sm text-gray-400 mt-6 leading-relaxed font-light">
-              Use any UPI gateway (GPay, PhonePe, Paytm, etc.) to securely transfer the <strong className="text-white">₹250</strong> registration fee.
-            </p>
+            {(() => {
+              const currentUpiId = settings.upiId || 'aadhilaadhil8851-2@okicici';
+              const currentPayee = settings.upiPayeeName || 'Mohammed Aadhil M';
+              const currentFee = settings.registrationFee || '250';
+              const upiUri = `upi://pay?pa=${encodeURIComponent(currentUpiId)}&pn=${encodeURIComponent(currentPayee)}&am=${encodeURIComponent(Number(currentFee).toFixed(2))}`;
+
+              return (
+                <>
+                  <div className="p-4 bg-white rounded-2xl shadow-[0_0_30px_rgba(255,42,42,0.15)] border border-red-500/20 flex flex-col items-center">
+                    <QRCodeSVG
+                      value={upiUri}
+                      size={160}
+                      level="M"
+                      includeMargin={false}
+                    />
+                    <div className="mt-4 text-center">
+                      <p className="text-xs text-gray-700 font-bold">UPI ID: {currentUpiId}</p>
+                      <p className="text-xs text-gray-500 mt-1">{currentPayee} • ₹{currentFee}</p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-400 mt-6 leading-relaxed font-light">
+                    Use any UPI gateway (GPay, PhonePe, Paytm, etc.) to securely transfer the <strong className="text-white">₹{currentFee}</strong> registration fee.
+                  </p>
+                </>
+              );
+            })()}
           </motion.div>
 
           {/* Instructions */}
@@ -154,7 +173,7 @@ export default function Payment() {
             <ol className="space-y-4">
               {[
                 'Scan the QR code using any UPI app (GPay, PhonePe, Paytm, etc.)',
-                'Pay the exact registration fee (₹250 per participant)',
+                `Pay the exact registration fee (₹${settings.registrationFee || '250'} per participant)`,
                 'Complete the transaction successfully',
                 'Take a screenshot of the payment confirmation',
                 'Enter the UPI Transaction ID / UTR number below',
