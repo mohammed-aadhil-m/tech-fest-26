@@ -198,8 +198,15 @@ export default function PaperSubmission() {
     if (!form.college.trim()) err.college = "College name is required";
     if (!form.paperTitle.trim())
       err.paperTitle = "Paper topic / title is required";
-    if (!form.abstract.trim() || form.abstract.trim().length < 100) {
-      err.abstract = "Abstract must be at least 100 characters";
+    if (!form.abstract.trim()) {
+      err.abstract = "Paper abstract / summary is required";
+    } else {
+      const words = form.abstract.trim().split(/\s+/).filter(Boolean);
+      if (words.length < 40) {
+        err.abstract = `Abstract must be at least 40 words (currently ${words.length} words)`;
+      } else if (words.length > 150) {
+        err.abstract = `Abstract must not exceed 150 words (currently ${words.length} words)`;
+      }
     }
     // If not editing, either file or drive link is required. If editing and existing file or link is present, it's valid.
     if (!file && !form.driveUrl.trim() && !existingFileName) {
@@ -757,14 +764,18 @@ export default function PaperSubmission() {
                       <label className="text-xs font-bold uppercase tracking-wider text-gray-300">
                         Paper Abstract / Summary <span className="text-red-500">*</span>
                       </label>
-                      <span className="text-[11px] text-gray-500 font-mono">
-                        {form.abstract.length} chars (min 100)
+                      <span className={`text-[11px] font-mono ${
+                        form.abstract.trim() && (form.abstract.trim().split(/\s+/).filter(Boolean).length < 40 || form.abstract.trim().split(/\s+/).filter(Boolean).length > 150)
+                          ? "text-red-400 font-bold"
+                          : "text-gray-400"
+                      }`}>
+                        {form.abstract.trim() ? form.abstract.trim().split(/\s+/).filter(Boolean).length : 0} words (min 40, max 150 words)
                       </span>
                     </div>
                     <textarea
                       required
                       rows={6}
-                      placeholder="Clearly explain the problem statement, proposed solution, methodology, results, and conclusion..."
+                      placeholder="Clearly explain the problem statement, proposed solution, methodology, results, and conclusion (min 40 words, max 150 words)..."
                       value={form.abstract}
                       onChange={(e) => handleChange("abstract", e.target.value)}
                       className={`w-full bg-white/5 border rounded-xl p-4 text-white placeholder-gray-600 focus:outline-none transition-all text-sm leading-relaxed ${

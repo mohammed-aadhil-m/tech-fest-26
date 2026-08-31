@@ -189,8 +189,10 @@ export default function Home() {
                 </h1>
                 
                 <div className="mt-4 sm:mt-6">
-                  <p className="text-sm sm:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-gray-100 to-gray-400 tracking-[0.2em] sm:tracking-[0.25em] uppercase text-center">
-                    N A T I O N A L  L E V E L  S Y M P O S I U M
+                  <p className="text-sm sm:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-gray-100 to-gray-400 uppercase text-center flex flex-wrap justify-center items-center gap-x-4 sm:gap-x-6">
+                    <span className="tracking-[0.2em] sm:tracking-[0.25em]">N A T I O N A L</span>
+                    <span className="tracking-[0.2em] sm:tracking-[0.25em]">L E V E L</span>
+                    <span className="tracking-[0.2em] sm:tracking-[0.25em]">S Y M P O S I U M</span>
                   </p>
                 </div>
                 
@@ -237,17 +239,6 @@ export default function Home() {
               </motion.div>
             </motion.div>
           </div>
-
-        {/* Scroll indicator */}
-        <motion.div
-          animate={{ y: [0, 10, 0], opacity: [0.3, 1, 0.3] }}
-          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 cursor-pointer"
-          onClick={() => document.getElementById('about').scrollIntoView({ behavior: 'smooth' })}
-        >
-          <div className="w-[1px] h-12 bg-gradient-to-b from-red-500 to-transparent" />
-          <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.2em]">Scroll</p>
-        </motion.div>
       </section>
 
       {/* ── ABOUT ───────────────────────────────────────── */}

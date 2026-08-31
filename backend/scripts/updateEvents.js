@@ -69,7 +69,7 @@ async function updateEvents() {
     for (const [slug, info] of Object.entries(eventVenues)) {
       await Event.updateOne(
         { slug },
-        { isTeamEvent: true, minTeamSize: 1, maxTeamSize: 2, time: info.time, venue: info.venue }
+        { isTeamEvent: true, minTeamSize: 2, maxTeamSize: 2, time: info.time, venue: info.venue }
       );
       console.log(`Updated ${slug}`);
     }

@@ -141,11 +141,12 @@ Login at `/admin/login` with:
 
 | Event | Type | Category |
 |-------|------|----------|
-| 📢 Paper Presentation | Individual | Technical |
+| 📢 Paper Presentation | Individual / Team (1-3) | Technical |
 | 🚀 Dev & Deploy | Individual | Technical |
 | 🐞 Bug Buster | Individual | Technical |
-| 🔍 Treasure Hunt 2.0 | Team (2-4) | Non-Technical |
-| 🎨 Connect & Sketch | Team (2-4) | Non-Technical |
+| 🔍 Treasure Hunt 2.0 | Team (2) | Non-Technical |
+| 🎨 Connect & Sketch | Team (2) | Non-Technical |
+| 🎵 Adaptune | Team (2) | Non-Technical |
 | ⏳ Coming Soon | — | Placeholder |
 
 ---

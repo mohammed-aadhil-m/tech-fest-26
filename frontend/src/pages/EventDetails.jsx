@@ -159,7 +159,7 @@ export default function EventDetails() {
               {event.isTeamEvent && (
                 <div className="flex items-center gap-2 text-sm text-gray-300 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5">
                   <Users size={15} className="text-red-500" />
-                  <span>Team size: {event.minTeamSize}–{event.maxTeamSize} members</span>
+                  <span>Team size: {event.minTeamSize === event.maxTeamSize ? `${event.maxTeamSize} members` : `${event.minTeamSize}–${event.maxTeamSize} members`}</span>
                 </div>
               )}
             </div>
@@ -334,7 +334,7 @@ export default function EventDetails() {
                 {event.isTeamEvent && (
                   <div className="flex justify-between">
                     <span className="text-gray-400">Team Size</span>
-                    <span className="font-medium text-white">{event.minTeamSize}–{event.maxTeamSize}</span>
+                    <span className="font-medium text-white">{event.minTeamSize === event.maxTeamSize ? `${event.maxTeamSize} Members` : `${event.minTeamSize}–${event.maxTeamSize} Members`}</span>
                   </div>
                 )}
                 {event.rounds && event.rounds.length > 0 && (
