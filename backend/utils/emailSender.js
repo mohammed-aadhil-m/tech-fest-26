@@ -84,7 +84,7 @@ const sendRegistrationEmail = async (userEmail, userName, registrationId, regist
           </p>
           <div style="margin-bottom: 15px;">
             <p style="margin: 0; font-size: 13px; color: #555555;">
-              <strong>Upload Paper Online:</strong> <a href="https://techfest26.com/submit-paper?regId=${registrationId}" style="color: #C40001; font-weight: bold; text-decoration: underline;">Visit Paper Submission Portal (submit-paper)</a>
+              <strong>Upload Paper Online:</strong> <a href="${process.env.FRONTEND_URL || 'https://techfest26.com'}/submit-paper?regId=${registrationId}" style="color: #C40001; font-weight: bold; text-decoration: underline;">Visit Paper Submission Portal</a>
             </p>
           </div>
           <h4 style="margin-top: 10px; margin-bottom: 8px; color: #C40001; font-size: 14px;">📋 Rules & Guidelines:</h4>
