@@ -17,6 +17,36 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+const sendEmailInternal = async (mailOptions) => {
+  if (process.env.BREVO_API_KEY) {
+    const payload = {
+      sender: { name: "TECH FEST '26", email: process.env.EMAIL_USER },
+      to: [{ email: mailOptions.to }],
+      subject: mailOptions.subject,
+      htmlContent: mailOptions.html
+    };
+    
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': process.env.BREVO_API_KEY,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Brevo API Error: ${response.status} - ${errorText}`);
+    }
+    return;
+  }
+  
+  // Fallback to nodemailer if no Brevo API key is provided
+  await transporter.sendMail(mailOptions);
+};
+
 const sendRegistrationEmail = async (userEmail, userName, registrationId, registeredEvents = [], foodPreference = '') => {
   const mailOptions = {
     from: `"TECH FEST '26" <${process.env.EMAIL_USER}>`,
@@ -77,11 +107,11 @@ const sendRegistrationEmail = async (userEmail, userName, registrationId, regist
   };
 
   try {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      console.log('Skipping email send: EMAIL_USER and EMAIL_PASS not configured in .env');
+    if (!process.env.EMAIL_USER) {
+      console.log('Skipping email send: EMAIL_USER not configured in .env');
       return;
     }
-    await transporter.sendMail(mailOptions);
+    await sendEmailInternal(mailOptions);
     console.log(`Registration email sent to ${userEmail}`);
   } catch (error) {
     console.error('Error sending registration email:', error);
@@ -131,11 +161,11 @@ const sendPaperSubmissionEmail = async (submission) => {
   };
 
   try {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      console.log('Skipping submission email send: EMAIL_USER and EMAIL_PASS not configured in .env');
+    if (!process.env.EMAIL_USER) {
+      console.log('Skipping submission email send: EMAIL_USER not configured in .env');
       return;
     }
-    await transporter.sendMail(mailOptions);
+    await sendEmailInternal(mailOptions);
     console.log(`Paper submission confirmation email sent to ${submission.email}`);
   } catch (error) {
     console.error('Error sending paper submission email:', error);
