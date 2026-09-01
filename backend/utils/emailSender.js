@@ -1,25 +1,21 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 
-const transporter = nodemailer.createTransport(
-  process.env.SMTP_HOST
-    ? {
-        host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT || 587,
-        secure: process.env.SMTP_PORT == 465, // true for 465, false for other ports
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
-      }
-    : {
-        service: 'gmail',
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
-      }
-);
+// Force IPv4 to prevent ETIMEDOUT on Render
+require('dns').setDefaultResultOrder('ipv4first');
+
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT) : 465,
+  secure: process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT) === 465 : true,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+  tls: {
+    rejectUnauthorized: false
+  }
+});
 
 const sendRegistrationEmail = async (userEmail, userName, registrationId, registeredEvents = [], foodPreference = '') => {
   const mailOptions = {
