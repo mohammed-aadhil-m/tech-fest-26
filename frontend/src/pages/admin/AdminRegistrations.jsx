@@ -324,7 +324,7 @@ export default function AdminRegistrations() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-xs font-mono text-gray-500">
-                      {new Date(reg.createdAt).toLocaleDateString('en-IN')}
+                      {new Date(reg.createdAt).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' })}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-center gap-3">
@@ -389,7 +389,7 @@ export default function AdminRegistrations() {
                 ['Food Preference', selectedReg.user?.foodPreference],
                 ['Registration Status', selectedReg.status],
                 ['Payment Status', selectedReg.paymentStatus || 'unpaid'],
-                ['Registration Date', new Date(selectedReg.createdAt).toLocaleString('en-IN')],
+                ['Registration Date', new Date(selectedReg.createdAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })],
               ].map(([label, value]) => (
                 <div key={label} className="bg-black/60 border border-white/5 rounded-xl p-4">
                   <p className="text-[10px] text-red-500 uppercase tracking-widest font-bold mb-1">{label}</p>

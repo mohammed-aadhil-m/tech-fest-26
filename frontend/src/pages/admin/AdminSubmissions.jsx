@@ -306,7 +306,7 @@ export default function AdminSubmissions() {
                       </td>
 
                       <td className="px-6 py-4 text-xs font-mono text-gray-500">
-                        {new Date(sub.submittedAt).toLocaleDateString('en-IN')}
+                        {new Date(sub.submittedAt).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' })}
                       </td>
 
                       <td className="px-6 py-4">

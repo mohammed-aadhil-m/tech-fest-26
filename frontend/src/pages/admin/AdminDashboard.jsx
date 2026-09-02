@@ -128,7 +128,7 @@ export default function AdminDashboard() {
                         </p>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <p className="text-[10px] text-gray-600 font-bold">{new Date(reg.createdAt).toLocaleDateString('en-IN')}</p>
+                        <p className="text-[10px] text-gray-600 font-bold">{new Date(reg.createdAt).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' })}</p>
                       </div>
                     </Link>
                   ))}

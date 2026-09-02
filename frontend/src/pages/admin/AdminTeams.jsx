@@ -313,7 +313,7 @@ export default function AdminTeams() {
                       </td>
 
                       <td className="px-6 py-4 text-xs font-mono text-gray-500">
-                        {new Date(team.createdAt).toLocaleDateString('en-IN')}
+                        {new Date(team.createdAt).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' })}
                       </td>
 
                       <td className="px-6 py-4">
@@ -391,7 +391,7 @@ export default function AdminTeams() {
                     {selectedTeam.teamName}
                   </h2>
                   <p className="text-xs text-gray-400 mt-1">
-                    Created on {new Date(selectedTeam.createdAt).toLocaleString('en-IN')}
+                    Created on {new Date(selectedTeam.createdAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
                   </p>
                 </div>
                 <div className="bg-black/80 border border-white/10 rounded-xl p-4 text-center sm:text-right">
