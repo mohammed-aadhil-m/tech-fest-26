@@ -24,6 +24,7 @@ async function updateEvents() {
       paperPres.time = '10:30 AM - 12:30 PM';
       paperPres.venue = 'CSE Seminar Hall';
       paperPres.submissionEmail = 'techfest.official2026@gmail.com';
+      paperPres.submissionDeadline = new Date("2026-09-06");
       paperPres.rules = [
         "Each participant/team will be given 10 minutes to present their paper.",
         "The presentation will be followed by a Q&A session with the judges.",
