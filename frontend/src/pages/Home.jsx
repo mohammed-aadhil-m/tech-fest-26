@@ -225,8 +225,9 @@ export default function Home() {
                 </div>
               </motion.div>
 
-              <motion.div variants={itemVariants} className="mb-12 flex justify-center">
-                <Countdown targetDate={settings.eventDate} label="EVENT STARTS IN" />
+              <motion.div variants={itemVariants} className="mb-12 flex flex-col sm:flex-row justify-center items-center gap-8 sm:gap-16">
+                <Countdown targetDate={settings.registrationDeadline || "2026-09-08T23:59:59+05:30"} label="REGISTRATION CLOSES IN" />
+                <Countdown targetDate={settings.eventDate || "2026-09-09T09:30:00+05:30"} label="EVENT STARTS IN" />
               </motion.div>
 
               <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
