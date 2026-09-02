@@ -1,40 +1,30 @@
 const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('cloudinary').v2;
 const path = require('path');
-const fs = require('fs');
 
-// Ensure upload directories exist
-const ensureDir = (dir) => { if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true }); };
-ensureDir(path.join(__dirname, '../uploads/papers'));
-ensureDir(path.join(__dirname, '../uploads/gallery'));
-ensureDir(path.join(__dirname, '../uploads/winners'));
-ensureDir(path.join(__dirname, '../uploads/payments'));
-
-// Storage for paper submissions
-const paperStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, '../uploads/papers')),
-  filename: (req, file, cb) => {
-    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, 'paper-' + unique + path.extname(file.originalname));
-  }
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Storage for gallery images
-const galleryStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, '../uploads/gallery')),
-  filename: (req, file, cb) => {
-    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, 'gallery-' + unique + path.extname(file.originalname));
-  }
-});
-
-// Storage for winner photos
-const winnerStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, '../uploads/winners')),
-  filename: (req, file, cb) => {
-    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, 'winner-' + unique + path.extname(file.originalname));
-  }
-});
+// Create storage functions for each category
+const createStorage = (folderName, allowedFormats = ['jpeg', 'jpg', 'png', 'gif', 'webp']) => {
+  return new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: `techfest26/${folderName}`,
+      allowed_formats: allowedFormats,
+      resource_type: folderName === 'papers' ? 'auto' : 'image',
+      public_id: (req, file) => {
+        const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        return `${folderName}-${unique}`;
+      },
+    },
+  });
+};
 
 const imageFilter = (req, file, cb) => {
   const allowed = /jpeg|jpg|png|gif|webp/;
@@ -56,34 +46,25 @@ const paperFilter = (req, file, cb) => {
 };
 
 exports.uploadPaper = multer({
-  storage: paperStorage,
+  storage: createStorage('papers', ['pdf', 'doc', 'docx', 'jpg', 'png']),
   fileFilter: paperFilter,
   limits: { fileSize: 10 * 1024 * 1024 } // 10MB
 }).single('paper');
 
 exports.uploadGallery = multer({
-  storage: galleryStorage,
+  storage: createStorage('gallery'),
   fileFilter: imageFilter,
   limits: { fileSize: 5 * 1024 * 1024 } // 5MB
 }).single('image');
 
 exports.uploadWinnerPhoto = multer({
-  storage: winnerStorage,
+  storage: createStorage('winners'),
   fileFilter: imageFilter,
   limits: { fileSize: 5 * 1024 * 1024 }
 }).single('photo');
 
-// Storage for payment screenshots
-const paymentStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, '../uploads/payments')),
-  filename: (req, file, cb) => {
-    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, 'payment-' + unique + path.extname(file.originalname));
-  }
-});
-
 exports.uploadPaymentScreenshot = multer({
-  storage: paymentStorage,
+  storage: createStorage('payments'),
   fileFilter: imageFilter,
   limits: { fileSize: 5 * 1024 * 1024 } // 5MB
 }).single('screenshot');

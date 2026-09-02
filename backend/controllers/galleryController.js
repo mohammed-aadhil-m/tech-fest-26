@@ -16,7 +16,7 @@ exports.uploadImage = async (req, res, next) => {
     if (!req.file) return res.status(400).json({ success: false, message: 'No image file provided.' });
     const { title, category } = req.body;
     const image = await Gallery.create({
-      imageUrl: `/uploads/gallery/${req.file.filename}`,
+      imageUrl: req.file.path,
       fileName: req.file.originalname,
       title,
       category: category || 'overall'

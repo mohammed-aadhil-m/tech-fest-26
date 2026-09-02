@@ -13,7 +13,7 @@ exports.createWinner = async (req, res, next) => {
   try {
     const { event, eventName, position, participantName, teamName, college } = req.body;
     const winnerData = { event, eventName, position, participantName, teamName, college };
-    if (req.file) winnerData.photoUrl = `/uploads/winners/${req.file.filename}`;
+    if (req.file) winnerData.photoUrl = req.file.path;
     const winner = await Winner.create(winnerData);
     res.status(201).json({ success: true, data: winner });
   } catch (err) { next(err); }
@@ -23,7 +23,7 @@ exports.createWinner = async (req, res, next) => {
 exports.updateWinner = async (req, res, next) => {
   try {
     const updateData = { ...req.body };
-    if (req.file) updateData.photoUrl = `/uploads/winners/${req.file.filename}`;
+    if (req.file) updateData.photoUrl = req.file.path;
     const winner = await Winner.findByIdAndUpdate(req.params.id, updateData, { new: true });
     if (!winner) return res.status(404).json({ success: false, message: 'Winner not found.' });
     res.json({ success: true, data: winner });

@@ -316,7 +316,7 @@ exports.createSubmission = async (req, res, next) => {
         if (normalizedRegId) existingSub.registrationId = normalizedRegId;
 
         if (req.file) {
-          existingSub.fileUrl = `/uploads/papers/${req.file.filename}`;
+          existingSub.fileUrl = req.file.path;
           existingSub.fileName = req.file.originalname;
         }
 
@@ -415,7 +415,7 @@ exports.createSubmission = async (req, res, next) => {
     };
 
     if (req.file) {
-      submissionData.fileUrl = `/uploads/papers/${req.file.filename}`;
+      submissionData.fileUrl = req.file.path;
       submissionData.fileName = req.file.originalname;
     }
 

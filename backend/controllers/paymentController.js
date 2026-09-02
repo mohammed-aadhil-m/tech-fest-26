@@ -47,7 +47,7 @@ exports.createPayment = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Payment screenshot is required.' });
     }
 
-    const screenshotUrl = `/uploads/payments/${req.file.filename}`;
+    const screenshotUrl = req.file.path;
 
     const payment = await Payment.create({
       registrationId,
