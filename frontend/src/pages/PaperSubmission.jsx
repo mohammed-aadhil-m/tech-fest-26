@@ -202,8 +202,8 @@ export default function PaperSubmission() {
       err.abstract = "Paper abstract / summary is required";
     } else {
       const words = form.abstract.trim().split(/\s+/).filter(Boolean);
-      if (words.length < 40) {
-        err.abstract = `Abstract must be at least 40 words (currently ${words.length} words)`;
+      if (words.length < 20) {
+        err.abstract = `Abstract must be at least 20 words (currently ${words.length} words)`;
       } else if (words.length > 150) {
         err.abstract = `Abstract must not exceed 150 words (currently ${words.length} words)`;
       }
@@ -551,7 +551,7 @@ export default function PaperSubmission() {
                             Paper Presentation Already Submitted!
                           </p>
                           <p className="text-xs text-gray-300 mt-0.5">
-                            You may edit your title, abstract, or re-upload new presentation slides before the deadline (04/09/2026).
+                            You may edit your title, abstract, or re-upload new presentation slides before the deadline (06/09/2026).
                           </p>
                         </div>
                       </div>
@@ -769,13 +769,13 @@ export default function PaperSubmission() {
                           ? "text-red-400 font-bold"
                           : "text-gray-400"
                       }`}>
-                        {form.abstract.trim() ? form.abstract.trim().split(/\s+/).filter(Boolean).length : 0} words (min 40, max 150 words)
+                        {form.abstract.trim() ? form.abstract.trim().split(/\s+/).filter(Boolean).length : 0} words (min 20, max 150 words)
                       </span>
                     </div>
                     <textarea
                       required
                       rows={6}
-                      placeholder="Clearly explain the problem statement, proposed solution, methodology, results, and conclusion (min 40 words, max 150 words)..."
+                      placeholder="Clearly explain the problem statement, proposed solution, methodology, results, and conclusion (min 20 words, max 150 words)..."
                       value={form.abstract}
                       onChange={(e) => handleChange("abstract", e.target.value)}
                       className={`w-full bg-white/5 border rounded-xl p-4 text-white placeholder-gray-600 focus:outline-none transition-all text-sm leading-relaxed ${

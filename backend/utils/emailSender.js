@@ -93,7 +93,7 @@ const sendRegistrationEmail = async (userEmail, userName, registrationId, regist
             <li style="margin-bottom: 6px;">The presentation will be followed by a Q&A session with the judges.</li>
             <li style="margin-bottom: 6px;">Participants should clearly explain the problem statement, proposed solution, methodology, results, and conclusion.</li>
             <li style="margin-bottom: 6px;">Presentation slides should be clear, concise, and relevant to the submitted paper.</li>
-            <li style="margin-bottom: 6px;">Participants may upload or update their presentation slides before the submission deadline (04/09/2026).</li>
+            <li style="margin-bottom: 6px;">Participants may upload or update their presentation slides before the submission deadline (06/09/2026).</li>
             <li style="margin-bottom: 0;">The presentation should be delivered by the registered participant/team members.</li>
           </ul>
         </div>

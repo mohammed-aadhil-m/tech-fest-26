@@ -29,13 +29,13 @@ async function updateEvents() {
         "The presentation will be followed by a Q&A session with the judges.",
         "Participants should clearly explain the problem statement, proposed solution, methodology, results, and conclusion.",
         "Presentation slides should be clear, concise, and relevant to the submitted paper.",
-        "Participants may upload or update their presentation slides before the submission deadline (04/09/2026).",
+        "Participants may upload or update their presentation slides before the submission deadline (06/09/2026).",
         "The presentation should be delivered by the registered participant/team members.",
         "Ensure your paper is original and plagiarism-free.",
         "Any form of malpractice will lead to immediate disqualification."
       ];
       paperPres.description = "Present your innovative ideas, research, technical knowledge, and creative solutions. Each participant/team gets 10 minutes for presentation followed by judge Q&A.";
-      paperPres.fullDescription = "Participants are requested to submit their paper presentation slides and abstract before the deadline (04/09/2026). Each participant/team will be given 10 minutes to present their paper, followed by a Q&A session with the judges. Participants should clearly explain the problem statement, proposed solution, methodology, results, and conclusion.";
+      paperPres.fullDescription = "Participants are requested to submit their paper presentation slides and abstract before the deadline (06/09/2026). Each participant/team will be given 10 minutes to present their paper, followed by a Q&A session with the judges. Participants should clearly explain the problem statement, proposed solution, methodology, results, and conclusion.";
       paperPres.evaluationCriteria = [
         { title: "Presentation & Timing", description: "Clarity of delivery within the allotted 10 minutes." },
         { title: "Problem & Solution", description: "Depth of problem statement and proposed methodology." },

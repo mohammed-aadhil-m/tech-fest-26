@@ -227,7 +227,7 @@ exports.verifyEligibility = async (req, res, next) => {
           leader: team.leader ? { name: team.leader.fullName, email: team.leader.email } : null,
           members: Array.isArray(team.members) ? team.members.map(m => ({ name: m.fullName, email: m.email })) : []
         } : null,
-        message: `A paper titled "${existingSubmission.paperTitle}" has already been submitted for this registration. You may update your paper presentation details or re-upload slides before the deadline (04/09/2026).`
+        message: `A paper titled "${existingSubmission.paperTitle}" has already been submitted for this registration. You may update your paper presentation details or re-upload slides before the deadline (06/09/2026).`
       });
     }
 
@@ -277,11 +277,11 @@ exports.createSubmission = async (req, res, next) => {
     }
 
     // Check deadline
-    const deadline = new Date('2026-09-04T23:59:59');
+    const deadline = new Date('2026-09-06T23:59:59');
     if (new Date() > deadline) {
-      return res.status(400).json({
+      return res.status(403).json({
         success: false,
-        message: 'Submission deadline has passed (04/09/2026).'
+        message: 'Submission deadline has passed (06/09/2026).'
       });
     }
 

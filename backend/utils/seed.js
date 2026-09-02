@@ -19,13 +19,13 @@ const events = [
     description:
       "Present your innovative ideas, research, technical knowledge, and creative solutions. Each participant/team gets 10 minutes for presentation followed by judge Q&A.",
     fullDescription:
-      "Participants are requested to submit their paper presentation slides and abstract before the deadline (04/09/2026). Each participant/team will be given 10 minutes to present their paper, followed by a Q&A session with the judges. Participants should clearly explain the problem statement, proposed solution, methodology, results, and conclusion.",
+      "Participants are requested to submit their paper presentation slides and abstract before the deadline (06/09/2026). Each participant/team will be given 10 minutes to present their paper, followed by a Q&A session with the judges. Participants should clearly explain the problem statement, proposed solution, methodology, results, and conclusion.",
     rules: [
       "Each participant/team will be given 10 minutes to present their paper.",
       "The presentation will be followed by a Q&A session with the judges.",
       "Participants should clearly explain the problem statement, proposed solution, methodology, results, and conclusion.",
       "Presentation slides should be clear, concise, and relevant to the submitted paper.",
-      "Participants may upload or update their presentation slides before the submission deadline (04/09/2026).",
+      "Participants may upload or update their presentation slides before the submission deadline (06/09/2026).",
       "The presentation should be delivered by the registered participant/team members.",
       "Ensure your paper is original and plagiarism-free.",
       "Any form of malpractice will lead to immediate disqualification."
