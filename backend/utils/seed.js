@@ -38,7 +38,7 @@ const events = [
     ],
     tagline: "Submit your ideas. Share your knowledge. Inspire others! 🚀",
     submissionEmail: "techfest.official2026@gmail.com",
-    submissionDeadline: new Date("2026-09-04"),
+    submissionDeadline: new Date("2026-09-06"),
     time: "10:30 AM - 12:30 PM",
     venue: "CSE Seminar Hall",
     isTeamEvent: true,
